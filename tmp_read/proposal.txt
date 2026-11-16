@@ -1,0 +1,357 @@
+--- PAGE 1 ---\nMulti-Task Uplift Modeling & Incremental Incentive
+Optimization for Customer Conversion
+Sai Kalyan Moguloju,Ankush Gul Makhijani
+F A26: CMPE-252 Sec 04 - Art Intl and Data Engr
+Abstract
+Making users perform an action is a never-ending industrial problem and every industry
+invests a lot to increase user interaction with their products or services and also retain
+them. One of the widely used techniques for growth or retention is offering users incentives
+or promotions which can increase the likelihood of user conversion. In the machine learning
+space, there are many baseline conversion models that can predict the chances of conversion
+for a given incentive using user features but they ignore to understand whether the incentive
+actually changes user behavior. This leads to the wasted resources by offering incentives to
+users who would convert anyway. We propose a project to build a machine learning model
+that reformulates customer-conversion targeting as an Individual Treatment Effect (ITE)
+estimation problem by using a multi tower neural network and a cost optimization function.
+We will evaluate the model using the open source data like Starbucks rewards.
+1\n--- PAGE 2 ---\nContents
+1 Introduction 3
+1.1 Background and Motivation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+1.2 Causal Foundations and Uplift . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+1.3 Scope and Objectives . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+2 Problem Statement 6
+2.1 Mathematical Formulation of Uplift . . . . . . . . . . . . . . . . . . . . . . . . . 6
+2.2 The Fundamental Problem of Causal Inference . . . . . . . . . . . . . . . . . . . 6
+2.3 Segmentation Quadrants . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+3 Related W ork 7
+3.1 Traditional Response Modeling vs. Causal Modeling . . . . . . . . . . . . . . . . 7
+3.2 Causal Meta-Learners . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+3.3 Deep Learning for Uplift Modeling . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+4 Proposed Solution 7
+4.1 Multi-Tower PyTorch Deep Neural Network Architecture . . . . . . . . . . . . . 7
+4.2 Net Utility Ranking Engine . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+5 Dataset and Preprocessing Pipeline 9
+5.1 Dataset Overview . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+5.2 Trajectory-Based Cohort Construction . . . . . . . . . . . . . . . . . . . . . . . . 9
+6 Proposed List of Experiments 9
+6.1 Baseline Models . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+6.2 Ablation Studies . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+7 Experiment Setup Details 10
+7.1 Software and Hardware Specifications . . . . . . . . . . . . . . . . . . . . . . . . 10
+8 Evaluation Metrics 11
+8.1 Area Under the Uplift Curve (AUUC) . . . . . . . . . . . . . . . . . . . . . . . . 11
+8.2 Qini Curve and Qini Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+9 Detailed Project Execution Timeline 12
+10 References 12
+2\n--- PAGE 3 ---\n1 Introduction
+1.1 Background and Motivation
+Survival of every industry in the current competitive market is decided by the user and their
+level of engagement. Industries, on the other hand, alongside their development, they invest
+a lot in growing and retaining users. Modern growth strategies depend heavily on promotions
+and incentives to keep users engaged and in addition the companies are moving towards using
+the machine-learning models to predict the conversion probability such asP(Y= 1|X) based
+on user features. However, the trouble is that the outcome of the predictions does not reflect
+the actual impact. To elaborate, the incentives are allocated solely on the model-predicted
+conversion which can lead to two major issues. Unwanted incentives are given to the organic
+users with high intent to remain engaged regardless of the incentive and low-intent users getting
+the incentives.
+These issues are prevalent because the models predicting the likelihood of the conversion do
+not consider the influence of incentives in users’ behavior which can lead to budget misallocation.
+The concept of Individual Treatment Effect (ITE) measures the difference between the users
+behavior or the outcome with and without incentives. Therefore, our goal is to build a neural
+network to understand the individual treatment effect and can identify users who are unlikely to
+convert when incentives are not provided and user who are likely to convert when the incentives
+are given. As an outcome, this model can help industries to reduce the incentive misallocation
+and gives industries the ability to target the right users with more effective use of the incentive
+budget.
+1.2 Causal Foundations and Uplift
+To solve the problem of incentive misallocation, prediction strategies must think beyond stan-
+dard outcome prediction and adapt to a causal framework, which focuses on predicting whether
+a user converts specifically because an incentive was provided [7, 9]. The primary focus of stan-
+dard models is estimating conditional conversion probabilities given user features,P(Y= 1|X).
+But when incentives are added to the modeling, we are not just observing baseline habits, but
+also how the introduction of incentives directly alters user choice.
+To model this, we compare user outcomes when an incentive is offered (T= 1) with outcomes
+when nothing is offered (T= 0). That is, each user has two possible outcomes:Y i(1) (with
+3\n--- PAGE 4 ---\nincentive) andY i(0) (without incentive). The Individual Treatment Effect (τ i) is the difference
+between these two outcomes, representing the direct influence of the incentive on the outcome.
+τi =E[Y i(1)−Y i(0)|X i] (1)
+whereE[· |Xi] denotes the expected value conditioned on the user’s feature vectorX i.
+In multiple incentives scenario or fixed and distinct incentive choicesT k ∈ {T0, T1, . . . , TK},
+the increase in the conversion probability caused mainly by giving user specific incentivek.
+Which is denoted as:
+Upliftk(Xi) =P(Y i = 1|X i, T=k)−P(Y i = 1|X i, T= 0) (2)
+The major challenge of causal inference is that we can only observe one outcome for each
+user—that is, eitherY i(1) orY i(0)—but cannot know the outcome for both at the same time [8].
+As we can only test one choice per user, we are missing the other half. We use uplift modeling
+[12], which addresses this counterfactual problem by evaluating a large user population where
+an incentive is offered to a treatment group and nothing to the control group. The measured
+difference in conversion rates between treatment and control groups estimates the net causal
+effect of the incentive.
+For these targeting problems, the user population can be categorized into four groups based
+on their outcomes:
+Table 1: Behavioral Segmentation in Causal Uplift Modeling
+Segment Yi(0) Yi(1) Business & Operational Impact
+Persuadables 0 1 Primary T arget.Converts only if given an incentive; maximizes ROI.
+Sure Things 1 1 Do Not T arget.High intent; Saves the budget.
+Lost Causes 0 0 Do Not T arget.Disengaged; offering incentive yields zero return.
+Sleeping Dogs 1 0 Avoid.Negative reaction; Incentives created user drop the intent.
+Using the above user segmentation, standard machine learning models target both “Per-
+suadables” and “Sure Things” because users in these groups exhibit high conversion probabili-
+ties, leading to budget misallocation when incentives are given to “Sure Things”. On the other
+hand, the uplift model targets only the “Persuadables” user segment, where conversion is higher
+specifically when an incentive is provided.
+Standard machine learning models are built to predict a single outcome for given features,
+but they do not support calculating causal differences. That is, with respect to the problem in
+4\n--- PAGE 5 ---\nthis proposal, traditional models cannot isolate the true conversion impact when an incentive
+is provided. To solve this, we can use meta-learners [4]. Meta-learners use standard machine
+learning models under the hood by arranging them in clever ways that can ultimately calculate
+the causal difference. Below are the standard meta-learner approaches:
+•S-Learner (Single Model):A single prediction modelf(X, T) uses the original user
+features (X) and the incentive flag (T) as another feature. The uplift (ˆτ(X)) is estimated
+by taking the difference of outcomes from the model used to predict the conversion score
+with the incentive (T= 1) and without the incentive (T= 0). On the other hand, the
+incentive flag alongside the other features may be ignored if the original feature set is very
+large.
+•T-Learner (Two Models):Two prediction models are used where one modelµ 1(X) is
+trained on the treatment data of the user who are presented with the incentive and the
+other modelµ 0(X) trained on the control data of the user without an incentive. Where
+the uplift is calculated as ˆτ(X) =µ 1(X)−µ 0(X). This model can reduce the treatment
+suppression but can suffer from the data imbalance between the arms.
+•X-Learner (Crossover Learner):This fixes the data imbalance problem and works
+in two stage. First guessed the counterfactual outcome of every user and later train the
+model on the guessed difference [4].
+These meta-learners are great as a baseline, but struggle with complex data with large
+feature set. As a mitigation, deep neural networks with shared features and separate treatment
+heads are needed.
+1.3 Scope and Objectives
+•Primary Goal:Design and evaluate a deep multi-tower neural network for causal uplift
+modeling across multiple incentives.
+•Core Objectives:
+–Build a shared feature trunk with dedicated output head for each discrete incentives
+(T∈ {T0, . . . , TK}).
+–Compare performance against standard baselines model using uplift ranking curves.
+5\n--- PAGE 6 ---\n•In-Scope:Offline dataset processing, model hyperparameter tuning, and comparative
+ranking performance analysis.
+•Out-of-Scope:Live production serving microservices and active online A/B testing.
+2 Problem Statement
+2.1 Mathematical Formulation of Uplift
+LetX∈R d represent observed user features,T∈ {0,1, . . . , K}denote the assigned treatment
+arm(T= 0 for the arm with the users without incentive;T k for users with the incentive of the
+tierk), andY∈ {0,1}represent the binary outcome of the user conversion.
+In reference to the Rubin-Neyman Potential Outcomes Framework [7], each user will have
+a potential outcomesY(T=k) irrespective of the incentive tier. The Individual Treatment
+Effect (ITE) for any incentive tierkrelative to control is:
+τk(X) =E[Y(T=k)|X]−E[Y(T= 0)|X] (3)
+2.2 The Fundamental Problem of Causal Inference
+Because individual counterfactual outcomes are unobserved [8], models rely on three structural
+assumptions. These condition will fill the gap between observed data and the causal inference.
+This will ensure the model estimates the real treatment influence instead of unknown selection
+bias.
+•Unconfoundedness:No hidden bias. Incentive assignments should only depend on the
+user features (X) that are available to see and measure [10].
+(Y(0), Y(1), . . . , Y(K))⊥T|X
+•Positivity:For every type of user profile with similar features, there must be a non-zero
+probability of receiving any incentive tier or no incentive.
+0< P(T=k|X)<1,∀k∈ {0, . . . , K}
+•SUTV A:The Stable Unit Treatment Value Assumption requires that the incentive to
+one user should not impact the outcome of the other user [11].
+6\n--- PAGE 7 ---\n2.3 Segmentation Quadrants
+Based on the potential outcome combinations defined in Section 1.2 (Table 1), uplift modeling
+will only target thePersuadablessegment (Y(0) = 0, Y(1) = 1) to maximize conversion and
+exclude the rest as they do not show any positive impact to the incentive.
+3 Related Work
+3.1 Traditional Response Modeling vs. Causal Modeling
+The proposal states that the standard machine learning models are not suitable for calculating
+the causal difference and instead focus on the outcome probabilityP(Y= 1|X). The literature
+also demonstrates the same thing that maximizing prediction accuracy does not correlate with
+maximizing incremental revenue [5].
+3.2 Causal Meta-Learners
+As described in Section 1.2, standard meta-learners (S-, T-, and X-Learners) use standard
+machine learning models to estimate the Individual Treatment Effects [4]. These meta-learners
+are useful for smaller datasets and feature sets whereas for high-dimensional feature spaces these
+model will struggle and become inefficient when applied to multiple incentive tiers.
+3.3 Deep Learning for Uplift Modeling
+The proposal is to build a deep neural network to solve this incentive allocation problem. We
+want to use the modern deep learning models like TarNet and CFRNet to estimate the causal
+effect. These models use a shared base to learn balanced representation across all the treatment
+arms [13]. Additionally, these models come with the built in domain regularization and penalty
+functions to eliminate representation discrepancies and achieve fair causal comparison across all
+the treatment arms [14].
+4 Proposed Solution
+4.1 Multi-Tower PyTorch Deep Neural Network Architecture
+We propose a Multi-Tower Deep Neural Network build for multiple incentive allocation.
+7\n--- PAGE 8 ---\n[Input Feature
+VectorX]
+(Demographics,
+Activity, Tenure)
+Shared Repre-
+sentation Layer
+(Multi-Layer Percep-
+tron / Autoencoder)
+Control
+Tower
+(T= 0)
+Treatment 1
+(T= 1)
+Treatment 2
+(T= 2)
+Incremental Uplift Layer
+Upliftk =P(Y= 1|X, T=
+k)−P(Y= 1|X, T= 0)
+Net Utility Ranking Function
+arg maxk[Upliftk −Cost(T k)]
+Figure 1: Multi-Tower Architecture for Multiple Incentive Optimization.
+4.2 Net Utility Ranking Engine
+The incentive with higher tier of benefits can have higher conversion compared to the other
+tiers. Ranking higher tier more can impact the incentive revenue. So instead of assigning
+incentive ranking based on maximum uplift, the model will include cost parametersC(T k) to
+each incentive tierk:
+k∗ = arg max
+k∈{0,...,K}
+(ˆτk(X)·V−C(T k)) (4)
+whereVrepresents monetary conversion value, andC(T k) is the margin cost of the incentive
+8\n--- PAGE 9 ---\n5 Dataset and Preprocessing Pipeline
+5.1 Dataset Overview
+The evaluation will use an open-source dataStarbucks Rewards Offer Dataset[1]. The
+dataset include the user behavior over a 30-day window on the mobile application. The data is
+distributed into three relational files:
+•Portfolio:Incentive metadata including tier, minimum spend threshold, incentive value,
+validity duration, and distribution channels.
+•Profile:Customer demographic features (X) including age, income level, gender, and
+membership tenure.
+•T ranscript:Timestamped event logs tracking incentive receipts, views, completions, and
+general transaction amounts.
+5.2 Trajectory-Based Cohort Construction
+The proposal is primary focused on building the causal uplift model to understand the influence
+on the conversion when the users presented with and without the incentives. On the other
+hand, all users in the dataset receive incentives and the explicit no incentive control group is
+unavailable. We will look at each user’s event history to know whether the user have viewed any
+incentive before making the transaction and accordingly will separate them into true treatment
+group (users with incentive) and control group (users without incentives).
+•T reatment Cohort (T k):Users who received incentivesk,actively viewed it, and com-
+pleted the required spend within the valid window.
+•Control Cohort (T 0):Users who received an incentive butnever viewed itprior to
+transacting, isolating uninfluenced organic conversionY(0).
+6 Proposed List of Experiments
+6.1 Baseline Models
+To evaluate the efficiency of the proposed Multi-Tower Deep Neural Network, we compare its
+performance against distinct baseline models:
+9\n--- PAGE 10 ---\n•Single-T arget Standard Classifiers:The baseline models like logistic regression, Light-
+GBM, etc. are trained directly on the conversion outcomeYusing the incentive treatment
+Tk as a standard input feature. The models focus on the simple outcome prediction with-
+out including the causal counterfactual reasoning.
+•Standard Causal Meta-Learners:Using the established meta-learning algorithms im-
+plemented viaCausalML[2] andEconML[3]. The techniques we want to use is covered in
+Section 1.2.
+6.2 Ablation Studies
+To isolate the contribution of individual architectural design choices, we propose the following
+systematic ablation experiments:
+•Shared Representation Initialization:- We will evaluate if the autoencoder pre-
+training helps the model to understand the user behavior compared to the standard layers
+where we initialize the network with random weights and train the entire model at once
+followed by learning the features and uplift predictions together.
+•Propensity W eighting Loss Mechanics:We will evaluate the Inverse Propensity
+Score (IPS) weighted loss to improve the model estimation. This will help the model to
+avoid targeting the organic user with the incentive. [16].
+7 Experiment Setup Details
+7.1 Software and Hardware Specifications
+•Software:The deep neural architectures will be built using Python 3.10+ and Py-
+Torch 2.x including Scikit-Learn and LightGBM for baseline modeling. The open-source
+CausalML [2] package for Causal benchmarking and EconML [3] package for meta-learning.
+•Hardware:The model training and causal analysis will be executed locally on an Apple
+Mac mini (M4 Pro, 14-core CPU, 20-core GPU, 64 GB Unified Memory). Additionally, the
+experiment will use PyTorch Metal Performance Shaders (mps) for hardware acceleration.
+10\n--- PAGE 11 ---\n8 Evaluation Metrics
+This section covers the performance evaluation. To evaluate the performance without the
+counterfactual information, we will rank everyone from most to least persuadable ˆτ(Xi) grouped
+by percentagesk∈(0,1]. For top-kgroups, we will count the total number of the instances
+and how many converted. LetN (k) be the instances in the top-kgroups, whereY t(k) andY c(k)
+denote the number of conversion with the incentive (T= 1) and without the incentive (T= 0).
+Similarly,N t(k) andN c(k) represent sample sizes within the top-kgroups.
+8.1 Area Under the Uplift Curve (AUUC)
+The uplift gaing(k) at each groupkmeasures the conversion rate achieved by targeting the
+top-kgroup
+g(k) =
+(︃ Yt(k)
+Nt(k) − Yc(k)Nc(k) )︃ ·N (k) (5)
+TheArea Under the Uplift Curve (AUUC)is calculated by integratingg(k) across all
+groupsk∈(0,1]:
+AUUC =
+∫︂ 1
+0
+g(k)dk≈
+K∑︂
+j=1
+g
+(︃ j
+K
+)︃
+∆k(6)
+whereKis the number of groups used to evaluation.
+8.2 Qini Curve and Qini Score
+AUUC primarily evaluates the conversion differences but cannot count the users converted. We
+will useQini curveq(k) to measure the count of user converted.
+q(k) =Y t(k)−Y c(k)· Nt(k)Nc(k) (7)
+The term Nt(k)Nc(k) corrects the imbalance in the class or tier variations between the groups.
+TheQini Score (Q)represents the performance gain using the area between the model’s
+Qini curve and a baseline random targeting (q random(k)):
+Q=
+∫︂ 1
+0
+(q(k)−q random(k))dk(8)
+whereq random(k) =k·
+(︂
+Yt(1)−Y c(1)· Nt(1)Nc(1)
+)︂
+is the expected number of incremental conversions
+we get if we randomly target a groupkof the total instances.
+11\n--- PAGE 12 ---\n9 Detailed Project Execution Timeline
+Project Weeks
+Data Pipeline & Preprocessing
+Baseline Model Setup (S/T/X-Learners)
+Multi-Tower PyTorch Architecture
+Net Utility Module & Integration
+Evaluation (AUUC / ROI Analysis)
+Final Documentation & Report
+Figure 2: Gantt Chart of Proposed Project Timeline.
+10 References
+References
+[1] Udacity. (2018).Starbucks Rewards Offer Dataset. Udacity Data Sci-
+ence Capstone Challenge. Available at:https://github.com/salgha/
+starbucks-customers-segmentation/tree/master/data.
+[2] Chen, H., Harinen, T., Lee, J. Y., Yung, M., & Zhao, Z. (2020).CausalML: Python Package
+for Causal Machine Learning and Uplift Modeling. arXiv preprint arXiv:2002.11623.
+[3] Microsoft Research. (2019).EconML: A Python Package for ML-Based Heterogeneous
+Treatment Effects Estimation. Available at:https://github.com/microsoft/EconML.
+[4] K¨ unzel, S. R., Sekhon, J. S., Bickel, P. J., & Yu, B. (2019).Metalearners for estimating het-
+erogeneous treatment effects using machine learning. Proceedings of the National Academy
+of Sciences, 116(10), 4156–4165.
+[5] Radcliffe, N. J., & Surry, P. D. (2011).Real-world uplift modelling with significance testing.
+Stochastic Solutions White Paper, 1–15.
+[6] Radcliffe, N. J. (2007).Using uplift modelling to aim target marketing at the right cus-
+tomers. Direct Marketing Analytics, 1–10.
+[7] Rubin, D. B. (1974).Estimating causal effects of treatments in randomized and nonran-
+domized studies. Journal of Educational Psychology, 66(5), 688–701.
+12\n--- PAGE 13 ---\n[8] Holland, P. W. (1986).Statistics and causal inference. Journal of the American Statistical
+Association, 81(396), 945–960.
+[9] Imbens, G. W., & Rubin, D. B. (2015).Causal Inference in Statistics, Social, and Biomed-
+ical Sciences. Cambridge University Press.
+[10] Rosenbaum, P. R., & Rubin, D. B. (1983).The central role of the propensity score in
+observational studies for causal effects. Biometrika, 70(1), 41–55.
+[11] Rubin, D. B. (1986).Which ifs have answers? Comment on “Statistics and causal infer-
+ence”. Journal of the American Statistical Association, 81(396), 961–962.
+[12] Gutierrez, P., & G´ erard, J. Y. (2017).Causal inference and uplift modelling: A review of
+the literature. International Conference on Predictive Applications and APIs, PMLR, 67,
+1–13.
+[13] Shalit, U., Johansson, F. D., & Sontag, D. (2017).Estimating individual treatment ef-
+fect: Generalization bounds and algorithms. International Conference on Machine Learning
+(ICML), PMLR, 70, 3076–3085.
+[14] Johansson, F. D., Shalit, U., & Sontag, D. (2016).Learning representations for coun-
+terfactual inference. International Conference on Machine Learning (ICML), PMLR, 48,
+3020–3029.
+[15] Jaskowski, M., & Jaroszewicz, S. (2012).Uplift modeling for clinical trial data. ICML
+Workshop on Clinical Data Analysis.
+[16] Hirano, K., Imbens, G. W., & Ridder, G. (2003).Efficient estimation of average treatment
+effects using the estimated propensity score. Econometrica, 71(4), 1161–1189.
+13
