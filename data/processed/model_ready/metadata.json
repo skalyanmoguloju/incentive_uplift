@@ -120,7 +120,7 @@
   "sources": {
     "transactions_and_completions": "data\\processed\\transcript_cleaned.jsonl",
     "demographics": "data\\processed\\profile_cleaned.jsonl",
-    "exposure_receipts": "data\\raw\\transcript.json",
-    "exposure_catalog": "data\\raw\\portfolio.json"
+    "exposure_receipts": "data\\processed\\transcript_cleaned.jsonl",
+    "exposure_catalog": "data\\processed\\portfolio_cleaned.jsonl"
   }
 }
