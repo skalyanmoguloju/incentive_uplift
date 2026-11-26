@@ -1,0 +1,4 @@
+variable,range_min,range_max,mean,median
+profile.age,18.0,101.0,54.471117647058826,55.0
+profile.income,30000.0,120000.0,65225.23529411765,64000.0
+transaction.amount,0.05,1062.28,12.777356156398206,8.89
