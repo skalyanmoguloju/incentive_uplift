@@ -53,7 +53,7 @@ Event payload keys: amount (138953), offer id (134002), offer_id (33579), reward
 
 Unique customers in transcript: 17000. Events per customer: min=1, max=51, mean=18.0.
 
-Timestamp range in day index: 0 to 714.
+Timestamp range in hours since study start: 0 to 714.
 
 Transactions: 138953; offer views: 57725; offer receipts: 76277; offer completions: 33579.
 

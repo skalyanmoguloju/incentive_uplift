@@ -1,0 +1,295 @@
+{
+  "source": "https://dataverse.yale.edu/dataset.xhtml?persistentId=doi:10.60600/YU/CGMWNW",
+  "source_sha256": "d8dd711c5216443d21e60050d768a7269b3ea9d656dbedd6802a738c2d0b080f",
+  "rows": 344084,
+  "columns": 16,
+  "variable_labels": {
+    "sex": "sex",
+    "yob": "year of birth",
+    "g2000": "voted in 2000 general election",
+    "g2002": "voted in 2002 general election",
+    "g2004": "voted in 2004 general election",
+    "p2000": "voted in 2000 primary election",
+    "p2002": "voted in 2002 primary election",
+    "p2004": "Voted in August 2004 Primary",
+    "treatment": "Experimental Group",
+    "cluster": "id number for geographic cluster (id-type variable)",
+    "voted": "Voted in August 2006 Primary",
+    "hh_id": "id number for household (id-type variable)",
+    "hh_size": "number of people in household",
+    "numberofnames": "Number of names on Neighbors mailer, if assigned to Neighbors",
+    "p2004_mean": "Mean voting history in Primary 2004 on Neighbors Mailer",
+    "g2004_mean": "Mean voting history in General 2004 on Neighbors Mailer"
+  },
+  "missing": {
+    "sex": 0,
+    "yob": 0,
+    "g2000": 0,
+    "g2002": 0,
+    "g2004": 0,
+    "p2000": 0,
+    "p2002": 0,
+    "p2004": 0,
+    "treatment": 0,
+    "cluster": 0,
+    "voted": 0,
+    "hh_id": 0,
+    "hh_size": 0,
+    "numberofnames": 0,
+    "p2004_mean": 0,
+    "g2004_mean": 0
+  },
+  "nunique": {
+    "sex": 2,
+    "yob": 86,
+    "g2000": 2,
+    "g2002": 2,
+    "g2004": 1,
+    "p2000": 2,
+    "p2002": 2,
+    "p2004": 2,
+    "treatment": 5,
+    "cluster": 10000,
+    "voted": 2,
+    "hh_id": 180002,
+    "hh_size": 8,
+    "numberofnames": 20,
+    "p2004_mean": 121,
+    "g2004_mean": 52
+  },
+  "age_range_2006": [
+    20,
+    106
+  ],
+  "identical_rows": 119,
+  "duplicate_note": "No unique person ID; retain identical rows because household members can share all recorded attributes.",
+  "fractional_household_ids": [
+    41511.5,
+    43601.5
+  ],
+  "household_csv_max_absolute_difference": 2.2737367544323206e-13,
+  "household_csv_has_outcome": false,
+  "arms": [
+    {
+      "code": 0,
+      "arm": "Control",
+      "individuals": 191243,
+      "households": 99999,
+      "turnout_count": 56730,
+      "turnout_rate": 0.2966383083302395
+    },
+    {
+      "code": 1,
+      "arm": "Hawthorne",
+      "individuals": 38204,
+      "households": 20002,
+      "turnout_count": 12316,
+      "turnout_rate": 0.3223746204585907,
+      "effect_pp": 2.573631212835132,
+      "se_pp": 0.3257893052960974,
+      "ci95_pp": [
+        1.9350841744547813,
+        3.212178251215483
+      ]
+    },
+    {
+      "code": 2,
+      "arm": "Civic Duty",
+      "individuals": 38218,
+      "households": 20001,
+      "turnout_count": 12021,
+      "turnout_rate": 0.31453765241509235,
+      "effect_pp": 1.7899344084852906,
+      "se_pp": 0.3236626625632523,
+      "ci95_pp": [
+        1.1555555898613161,
+        2.4243132271092653
+      ]
+    },
+    {
+      "code": 3,
+      "arm": "Neighbors",
+      "individuals": 38201,
+      "households": 20000,
+      "turnout_count": 14438,
+      "turnout_rate": 0.3779482212507526,
+      "effect_pp": 8.130991292051313,
+      "se_pp": 0.33695549837835176,
+      "ci95_pp": [
+        7.470558515229743,
+        8.791424068872882
+      ]
+    },
+    {
+      "code": 4,
+      "arm": "Self",
+      "individuals": 38218,
+      "households": 20000,
+      "turnout_count": 13191,
+      "turnout_rate": 0.3451514992935266,
+      "effect_pp": 4.851319096328721,
+      "se_pp": 0.33000196528772013,
+      "ci95_pp": [
+        4.2045152443647895,
+        5.498122948292653
+      ]
+    }
+  ],
+  "household_balance": [
+    {
+      "arm": "Hawthorne",
+      "max_abs_smd": 0.00852856126977299,
+      "smd_by_feature": {
+        "sex": 0.003504664033964169,
+        "yob": 0.00852856126977299,
+        "hh_size": -0.0033925491572420257,
+        "g2000": 0.0016868910714351885,
+        "g2002": 0.0043123896798531675,
+        "p2000": -0.004275846811499267,
+        "p2002": 0.006860215870583311,
+        "p2004": 0.004839818046261114
+      }
+    },
+    {
+      "arm": "Civic Duty",
+      "max_abs_smd": 0.010469870205094163,
+      "smd_by_feature": {
+        "sex": 0.0015811270243378602,
+        "yob": 0.010469870205094163,
+        "hh_size": -0.0022692705237539936,
+        "g2000": -0.0034061627310336367,
+        "g2002": 0.0060186645883530945,
+        "p2000": 0.0038424013797392115,
+        "p2002": 0.002775879401545935,
+        "p2004": -0.002537062966777444
+      }
+    },
+    {
+      "arm": "Neighbors",
+      "max_abs_smd": 0.013535494366050482,
+      "smd_by_feature": {
+        "sex": 0.008538166077086082,
+        "yob": -0.002186112092314443,
+        "hh_size": -0.003312398744986777,
+        "g2000": -0.0038907815221275424,
+        "g2002": 0.002603180822250207,
+        "p2000": -0.004467017174301824,
+        "p2002": -0.006227828319414436,
+        "p2004": 0.013535494366050482
+      }
+    },
+    {
+      "arm": "Self",
+      "max_abs_smd": 0.01378647154262044,
+      "smd_by_feature": {
+        "sex": -0.003317967848140981,
+        "yob": 0.0054270007308099034,
+        "hh_size": -0.0021539706990774594,
+        "g2000": -0.01378647154262044,
+        "g2002": 0.002849398446366074,
+        "p2000": -0.005066595857605708,
+        "p2002": 0.003879144137298302,
+        "p2004": 0.009514475301108542
+      }
+    }
+  ],
+  "randomization_blocks": 10000,
+  "block_household_count_distribution": {
+    "18": 9998,
+    "19": 2
+  },
+  "block_arm_minimum": {
+    "0.0": 9,
+    "1.0": 2,
+    "2.0": 2,
+    "3.0": 2,
+    "4.0": 2
+  },
+  "model_features": [
+    "sex",
+    "approx_age_2006",
+    "hh_size",
+    "g2000",
+    "g2002",
+    "p2000",
+    "p2002",
+    "p2004",
+    "approx_age_squared"
+  ],
+  "split": {
+    "seed": 252,
+    "train_rows": 275297,
+    "test_rows": 68787,
+    "train_blocks": 8000,
+    "test_blocks": 2000,
+    "household_overlap": 0
+  },
+  "observed_outcome_models": {
+    "constant": {
+      "auc": 0.5,
+      "log_loss": 0.6254108927401363,
+      "brier": 0.21690300879968238
+    },
+    "features_only": {
+      "auc": 0.6639628153036884,
+      "log_loss": 0.5855989059903287,
+      "brier": 0.2003307542681223,
+      "iterations": 6
+    },
+    "features_and_assigned_arm": {
+      "auc": 0.6686558478936966,
+      "log_loss": 0.5838400185866395,
+      "brier": 0.19958191556436955,
+      "iterations": 6
+    },
+    "arm_specific_coefficients": {
+      "auc": 0.6684417936897391,
+      "log_loss": 0.5839652052547042,
+      "brier": 0.19963258352656155
+    }
+  },
+  "interaction_fit_improvement": {
+    "mean_log_loss_reduction": -0.0001251866680648559,
+    "block_robust_ci95": [
+      -0.00027798704736203464,
+      2.7613711232322828e-05
+    ],
+    "interpretation": "Observed-outcome fit only; not a validation of CATE or uplift ranking."
+  },
+  "starbucks": {
+    "customers": 17000,
+    "events": 306534,
+    "offer_catalog_size": 10,
+    "event_counts": {
+      "transaction": 138953,
+      "offer received": 76277,
+      "offer viewed": 57725,
+      "offer completed": 33579
+    },
+    "customers_with_no_receipts": 6,
+    "receipt_waves_hours": {
+      "0": 12650,
+      "168": 12669,
+      "336": 12711,
+      "408": 12778,
+      "504": 12704,
+      "576": 12765
+    },
+    "unique_customer_offer_pairs": 63288,
+    "pairs_with_repeat_receipts": 11718,
+    "receipts_beyond_first_per_pair": 12989,
+    "receipts_while_prior_offer_still_active": 30005,
+    "customers_with_overlapping_offer_windows": 14462,
+    "missing_gender": 2175,
+    "missing_income": 2175,
+    "age_118_sentinel_count": 2175,
+    "max_time_hours": 714,
+    "note": "No-receipt customers alone do not establish a documented randomized control arm."
+  },
+  "limitations": [
+    "Single exploratory geographic split, no hyperparameter search.",
+    "Strong prediction and average treatment effects do not establish useful heterogeneous effects.",
+    "Treatment CIs cluster by household and ignore block fixed effects, matching the source's model (a).",
+    "Neither model scores nor causal-effect targeting policies are saved."
+  ]
+}

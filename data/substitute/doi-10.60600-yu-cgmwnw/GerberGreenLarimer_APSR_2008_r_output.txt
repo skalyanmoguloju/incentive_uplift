@@ -1,0 +1,215 @@
+socialagg$treatment: 0
+   treatment    hh_size          g2002            g2000            p2004       
+ Min.   :0   Min.   :1.000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:0   1st Qu.:1.000   1st Qu.:0.6667   1st Qu.:1.0000   1st Qu.:0.0000  
+ Median :0   Median :2.000   Median :1.0000   Median :1.0000   Median :0.3333  
+ Mean   :0   Mean   :1.912   Mean   :0.8344   Mean   :0.8663   Mean   :0.4166  
+ 3rd Qu.:0   3rd Qu.:2.000   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+ Max.   :0   Max.   :7.000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
+     p2002            p2000             sex              yob      
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :1900  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.5000   1st Qu.:1946  
+ Median :0.3333   Median :0.0000   Median :0.5000   Median :1957  
+ Mean   :0.4087   Mean   :0.2649   Mean   :0.5023   Mean   :1955  
+ 3rd Qu.:1.0000   3rd Qu.:0.5000   3rd Qu.:0.5000   3rd Qu.:1964  
+ Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1986  
+------------------------------------------------------------ 
+socialagg$treatment: 1
+   treatment    hh_size         g2002            g2000            p2004       
+ Min.   :1   Min.   :1.00   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:1   1st Qu.:1.00   1st Qu.:0.6667   1st Qu.:1.0000   1st Qu.:0.0000  
+ Median :1   Median :2.00   Median :1.0000   Median :1.0000   Median :0.3333  
+ Mean   :1   Mean   :1.91   Mean   :0.8357   Mean   :0.8668   Mean   :0.4188  
+ 3rd Qu.:1   3rd Qu.:2.00   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+ Max.   :1   Max.   :7.00   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
+     p2002            p2000             sex              yob      
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :1908  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.5000   1st Qu.:1946  
+ Median :0.3333   Median :0.0000   Median :0.5000   Median :1957  
+ Mean   :0.4117   Mean   :0.2632   Mean   :0.5032   Mean   :1955  
+ 3rd Qu.:1.0000   3rd Qu.:0.5000   3rd Qu.:0.5000   3rd Qu.:1964  
+ Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1984  
+------------------------------------------------------------ 
+socialagg$treatment: 2
+   treatment    hh_size          g2002            g2000            p2004       
+ Min.   :2   Min.   :1.000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:2   1st Qu.:1.000   1st Qu.:0.6667   1st Qu.:1.0000   1st Qu.:0.0000  
+ Median :2   Median :2.000   Median :1.0000   Median :1.0000   Median :0.3333  
+ Mean   :2   Mean   :1.911   Mean   :0.8361   Mean   :0.8654   Mean   :0.4155  
+ 3rd Qu.:2   3rd Qu.:2.000   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+ Max.   :2   Max.   :8.000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
+     p2002            p2000             sex              yob      
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :1906  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.5000   1st Qu.:1947  
+ Median :0.3333   Median :0.0000   Median :0.5000   Median :1957  
+ Mean   :0.4099   Mean   :0.2664   Mean   :0.5027   Mean   :1955  
+ 3rd Qu.:1.0000   3rd Qu.:0.5000   3rd Qu.:0.5000   3rd Qu.:1964  
+ Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1986  
+------------------------------------------------------------ 
+socialagg$treatment: 3
+   treatment    hh_size         g2002            g2000            p2004       
+ Min.   :3   Min.   :1.00   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:3   1st Qu.:1.00   1st Qu.:0.6667   1st Qu.:1.0000   1st Qu.:0.0000  
+ Median :3   Median :2.00   Median :1.0000   Median :1.0000   Median :0.3333  
+ Mean   :3   Mean   :1.91   Mean   :0.8351   Mean   :0.8653   Mean   :0.4227  
+ 3rd Qu.:3   3rd Qu.:2.00   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+ Max.   :3   Max.   :7.00   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
+     p2002            p2000             sex              yob      
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :1905  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.5000   1st Qu.:1946  
+ Median :0.3333   Median :0.0000   Median :0.5000   Median :1957  
+ Mean   :0.4060   Mean   :0.2631   Mean   :0.5046   Mean   :1955  
+ 3rd Qu.:1.0000   3rd Qu.:0.5000   3rd Qu.:0.5000   3rd Qu.:1964  
+ Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1986  
+------------------------------------------------------------ 
+socialagg$treatment: 4
+   treatment    hh_size          g2002            g2000            p2004       
+ Min.   :4   Min.   :1.000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:4   1st Qu.:1.000   1st Qu.:0.6667   1st Qu.:1.0000   1st Qu.:0.0000  
+ Median :4   Median :2.000   Median :1.0000   Median :1.0000   Median :0.3333  
+ Mean   :4   Mean   :1.911   Mean   :0.8352   Mean   :0.8625   Mean   :0.4209  
+ 3rd Qu.:4   3rd Qu.:2.000   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+ Max.   :4   Max.   :7.000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
+     p2002            p2000             sex              yob      
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :1908  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.5000   1st Qu.:1946  
+ Median :0.3333   Median :0.0000   Median :0.5000   Median :1957  
+ Mean   :0.4104   Mean   :0.2629   Mean   :0.5014   Mean   :1955  
+ 3rd Qu.:1.0000   3rd Qu.:0.5000   3rd Qu.:0.5000   3rd Qu.:1964  
+ Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1986  
+# weights:  50 (36 variable)
+initial  value 289702.043114 
+iter  10 value 235109.061974
+iter  20 value 234972.266897
+iter  30 value 234604.728165
+iter  40 value 234570.003652
+final  value 234553.325653 
+converged
+Call:
+multinom(formula = treatment ~ hh_size + g2002 + g2000 + p2004 + 
+    p2002 + p2000 + sex + yob, data = socialagg)
+
+Coefficients:
+  (Intercept)      hh_size      g2002        g2000        p2004        p2002
+1   -1.675663 -0.005927514 0.01219846  0.006812211  0.012395842  0.017168557
+2   -1.660660 -0.007570686 0.02560469 -0.018861353 -0.006467943  0.003040689
+3   -1.611600 -0.002709427 0.01566748 -0.017220102  0.027704762 -0.010719772
+4   -1.593593 -0.006182529 0.02025697 -0.054717706  0.021103429  0.012354561
+         p2000          sex         yob
+1 -0.010010879  0.013247377  0.07121807
+2  0.012423346  0.006645883  0.08717854
+3 -0.009588561  0.030372362 -0.01705505
+4 -0.007820037 -0.011593161  0.03198428
+
+Std. Errors:
+  (Intercept)    hh_size      g2002      g2000      p2004      p2002      p2000
+1  0.05831028 0.01176518 0.02802322 0.03039292 0.01794413 0.01847002 0.01991869
+2  0.05825953 0.01175887 0.02808910 0.03026113 0.01796147 0.01848061 0.01985730
+3  0.05808066 0.01176736 0.02797856 0.03021602 0.01792967 0.01849548 0.01992248
+4  0.05789803 0.01174238 0.02801758 0.02994821 0.01793922 0.01848031 0.01993307
+         sex        yob
+1 0.02835091 0.05496342
+2 0.02835407 0.05500109
+3 0.02835640 0.05483066
+4 0.02833237 0.05490514
+
+Residual Deviance: 469106.7 
+AIC: 469178.7 
+# weights:  10 (4 variable)
+initial  value 289702.043114 
+final  value 234562.636561 
+converged
+Likelihood ratio test
+
+Model 1: treatment ~ hh_size + g2002 + g2000 + p2004 + p2002 + p2000 + 
+    sex + yob
+Model 2: treatment ~ 1
+  #Df  LogLik  Df  Chisq Pr(>Chisq)
+1  36 -234553                      
+2   4 -234563 -32 18.622     0.9713
+     
+      Control Hawthorn Civic Duty Neighbors   Self
+  No   134513    25888      26197     23763  25027
+  Yes   56730    12316      12021     14438  13191
+Design library by Frank E Harrell Jr
+
+Type library(help='Design'), ?DesignOverview, or ?Design.Overview')
+to see overall documentation.
+
+
+Linear Regression Model
+
+ols(formula = voted ~ hawthorne + civicduty + neighbors + self, 
+    data = social, method = "qr", x = T)
+
+         n Model L.R.       d.f.         R2      Sigma 
+    344084       1170          4   0.003394     0.4641 
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.3779 -0.3145 -0.2966  0.6548  0.7034 
+
+Coefficients:
+            Value Std. Error      t  Pr(>|t|)
+Intercept 0.29664   0.001310 226.52 0.000e+00
+hawthorne 0.02574   0.003258   7.90 2.887e-15
+civicduty 0.01790   0.003237   5.53 3.202e-08
+neighbors 0.08131   0.003370  24.13 0.000e+00
+self      0.04851   0.003300  14.70 0.000e+00
+
+Residual standard error: 0.4641 on 344079 degrees of freedom
+Adjusted R-Squared: 0.003383 
+
+
+Linear Regression Model
+
+ols(formula = voted ~ hawthorne + civicduty + neighbors + self, 
+    method = "qr", x = T)
+
+         n Model L.R.       d.f.         R2      Sigma 
+    344084       1311          4   0.003804     0.4397 
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.9789 -0.3212 -0.1881  0.4903  0.9967 
+
+Coefficients:
+            Value Std. Error       t  Pr(>|t|)
+Intercept 0.29648   0.001232 240.630 0.000e+00
+hawthorne 0.02616   0.003065   8.535 0.000e+00
+civicduty 0.01804   0.003056   5.904 3.551e-09
+neighbors 0.08184   0.003181  25.730 0.000e+00
+self      0.04888   0.003109  15.726 0.000e+00
+
+Residual standard error: 0.4397 on 344079 degrees of freedom
+Adjusted R-Squared: 0.003793 
+
+
+Linear Regression Model
+
+ols(formula = voted ~ hawthorne + civicduty + neighbors + self + 
+    g2002 + g2000 + p2004 + p2002 + p2000, method = "qr", x = T)
+
+         n Model L.R.       d.f.         R2      Sigma 
+    344084      27733          9    0.07744     0.4231 
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.0779 -0.3167 -0.1500  0.4220  1.1501 
+
+Coefficients:
+               Value Std. Error         t  Pr(>|t|)
+Intercept -2.444e+03  16.180737 -151.0246 0.000e+00
+hawthorne  2.504e-02   0.002944    8.5053 0.000e+00
+civicduty  1.816e-02   0.002947    6.1621 7.187e-10
+neighbors  8.130e-02   0.003052   26.6346 0.000e+00
+self       4.819e-02   0.002994   16.0947 0.000e+00
+g2002      9.499e-02   0.002146   44.2631 0.000e+00
+g2000      1.507e-03   0.002341    0.6439 5.196e-01
+p2004      1.719e-01   0.001905   90.2184 0.000e+00
+p2002      1.227e-01   0.001876   65.4292 0.000e+00
+p2000      9.876e-02   0.002131   46.3403 0.000e+00
+
+Residual standard error: 0.4231 on 344074 degrees of freedom
+Adjusted R-Squared: 0.07741 
+

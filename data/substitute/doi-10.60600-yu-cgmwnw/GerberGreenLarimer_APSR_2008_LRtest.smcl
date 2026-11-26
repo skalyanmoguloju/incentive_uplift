@@ -1,0 +1,1038 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}/Users/dongreen/Dropbox/Social Pressure pubs/ETOV 2006/Output from LR test for GGL2008 for ISPS data archive.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}26 Apr 2020, 20:25:59
+
+{com}. do "/var/folders/6t/rwn0gqbj13q8sqhl_01s6j200000gn/T//SD35993.000000"
+{txt}
+{com}. * Program to evaluate heterogeneous treatment effects in Gerber, Green, and Larimer 2008, pp.39-40
+. *
+. * This program is in three parts.  
+. 
+. * Part 1 shows our original work-around to conduct a LR test while avoiding the complications of clustered assignment.
+. * In this part, we sample 1 subject from each household so that clustering is not an issue.  
+. * The base model tests the main effects of the four treatment indicators. 
+. * The alternative model adds interactions with "numvotes" and "hh_size," which amounts to 24 degrees of freedom.  
+. * The LR test is non-significant (i.e., the null of no interaction with vote propensity cannot be rejected).  
+. * In order to show the robustness of the result across various random samples, the sampling step is then iteratated, and
+. * the output displays the p-value given the average chi-square test statistic, which is again non-significant.
+. 
+. * Part 2 anticipates the randomization inference test in Part 3.  It simply shows that the LR test comes out about the same
+. * when one adds randomly generated treatments to both the base and alternative models, which is what we will do in Part 3.
+. * It also "shows" that the naive LR test comes up significant when one ignores clustering.
+. 
+. * Part 3 Uses randomization inference to address the nonstandard sampling distribution of the LR test statistic 
+. * under clustered random assignment. 
+. * In order to obtain the null reference distribution, faux treatments are randomly assigned by cluster, following 
+. * the same distribution as the actual treatments.  These faux treatments (called junk*) are
+. * interacted with numvotes and hh_size, and this alternative model is compared to the null model, with 24 fewer degrees of freedom,
+. * in which the faux treatments are included but not interacted.  The actual LR test statistic (using the real treatments
+. * and their interactions) is then compared to this null distribution in order to obtain the p-value.  
+. * The result is again non-significant (i.e., the null of no interaction with vote propensity cannot be rejected).
+. *
+. * Acknowledgement: The authors thank Yi Yin for her programming assistance.
+. 
+. **************************************************************
+. * PART 1: Randomly sample one person within household clusters
+. **************************************************************
+. 
+. * load replication data from ISPS archive
+. cd "/Users/dongreen/Dropbox/Social Pressure pubs/ETOV 2006"
+{res}/Users/dongreen/Dropbox/Social Pressure pubs/ETOV 2006
+{txt}
+{com}. use "GerberGreenLarimer_APSR_2008_social_pressure.dta", clear
+{txt}
+{com}. 
+. * create treatment indicators
+. xi: logistic voted i.treatment
+{txt}i.treatment{col 19}_Itreatment_0-4{col 39}(naturally coded; _Itreatment_0 omitted)
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}4{txt}){col 67}= {res}   1148.32
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-214044.79{txt}{col 49}Pseudo R2{col 67}= {res}    0.0027
+
+{txt}{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        voted{col 15}{c |} Odds Ratio{col 27}   Std. Err.{col 39}      z{col 47}   P>|z|{col 55}     [95% Con{col 68}f. Interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+_Itreatment_1 {c |}{col 15}{res}{space 2} 1.128035{col 27}{space 2} .0135779{col 38}{space 1}   10.01{col 47}{space 3}0.000{col 55}{space 4} 1.101734{col 68}{space 3} 1.154964
+{txt}_Itreatment_2 {c |}{col 15}{res}{space 2} 1.088029{col 27}{space 2} .0131657{col 38}{space 1}    6.97{col 47}{space 3}0.000{col 55}{space 4} 1.062528{col 68}{space 3} 1.114142
+{txt}_Itreatment_3 {c |}{col 15}{res}{space 2} 1.440646{col 27}{space 2} .0168257{col 38}{space 1}   31.26{col 47}{space 3}0.000{col 55}{space 4} 1.408043{col 68}{space 3} 1.474004
+{txt}_Itreatment_4 {c |}{col 15}{res}{space 2} 1.249742{col 27}{space 2} .0148308{col 38}{space 1}   18.79{col 47}{space 3}0.000{col 55}{space 4}  1.22101{col 68}{space 3} 1.279151
+{txt}{space 8}_cons {c |}{col 15}{res}{space 2} .4217436{col 27}{space 2} .0021113{col 38}{space 1} -172.46{col 47}{space 3}0.000{col 55}{space 4} .4176258{col 68}{space 3} .4259021
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. 
+. gen treat1= _Itreatment_1
+{txt}
+{com}. gen treat2= _Itreatment_2
+{txt}
+{com}. gen treat3= _Itreatment_3
+{txt}
+{com}. gen treat4= _Itreatment_4
+{txt}
+{com}. 
+. * note that there are six categories of past vote history (because g2004 is always 1)
+. gen numvotes= g2000+g2002 +g2004+ p2000+ p2002+ p2004
+{txt}
+{com}. tab numvotes
+
+   {txt}numvotes {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          1 {c |}{res}     21,784        6.33        6.33
+{txt}          2 {c |}{res}     26,060        7.57       13.90
+{txt}          3 {c |}{res}     80,436       23.38       37.28
+{txt}          4 {c |}{res}    136,031       39.53       76.82
+{txt}          5 {c |}{res}     65,852       19.14       95.95
+{txt}          6 {c |}{res}     13,921        4.05      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}    344,084      100.00
+{txt}
+{com}. 
+. * prepare to sample
+. set seed 123
+{txt}
+{com}. sample 1,count by(hh_id)
+{txt}(164,082 observations deleted)
+
+{com}. 
+. * LR test, avoiding clustering through sampling
+. * Verify that the number of samples matches the number of household clusters (180,002)
+. tab hh_size
+
+  {txt}number of {c |}
+  people in {c |}
+  household {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          1 {c |}{res}     47,834       26.57       26.57
+{txt}          2 {c |}{res}    107,043       59.47       86.04
+{txt}          3 {c |}{res}     19,158       10.64       96.69
+{txt}          4 {c |}{res}      5,229        2.90       99.59
+{txt}          5 {c |}{res}        663        0.37       99.96
+{txt}          6 {c |}{res}         67        0.04      100.00
+{txt}          7 {c |}{res}          7        0.00      100.00
+{txt}          8 {c |}{res}          1        0.00      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}    180,002      100.00
+{txt}
+{com}. * recode hh_size because otherwise the number of observations may not be the same across the two regressions
+. replace hh_size=6 if hh_size > 6
+{txt}(8 real changes made)
+
+{com}. 
+. * base model (clustering is irrelevant when one person is sampled per household)
+. logistic voted treat1 treat2 treat3 treat4 numvotes i.hh_size
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   180,002
+{txt}{col 49}LR chi2({res}10{txt}){col 67}= {res}   9641.68
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-108620.11{txt}{col 49}Pseudo R2{col 67}= {res}    0.0425
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}       voted{col 14}{c |} Odds Ratio{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}treat1 {c |}{col 14}{res}{space 2} 1.137174{col 26}{space 2} .0192566{col 37}{space 1}    7.59{col 46}{space 3}0.000{col 54}{space 4} 1.100051{col 67}{space 3}  1.17555
+{txt}{space 6}treat2 {c |}{col 14}{res}{space 2} 1.099992{col 26}{space 2}  .018708{col 37}{space 1}    5.60{col 46}{space 3}0.000{col 54}{space 4} 1.063929{col 67}{space 3} 1.137277
+{txt}{space 6}treat3 {c |}{col 14}{res}{space 2} 1.484418{col 26}{space 2} .0244753{col 37}{space 1}   23.96{col 46}{space 3}0.000{col 54}{space 4} 1.437214{col 67}{space 3} 1.533172
+{txt}{space 6}treat4 {c |}{col 14}{res}{space 2} 1.272498{col 26}{space 2}  .021291{col 37}{space 1}   14.40{col 46}{space 3}0.000{col 54}{space 4} 1.231445{col 67}{space 3}  1.31492
+{txt}{space 4}numvotes {c |}{col 14}{res}{space 2} 1.597364{col 26}{space 2} .0084902{col 37}{space 1}   88.12{col 46}{space 3}0.000{col 54}{space 4}  1.58081{col 67}{space 3} 1.614091
+{txt}{space 12} {c |}
+{space 5}hh_size {c |}
+{space 10}2  {c |}{col 14}{res}{space 2} .9657728{col 26}{space 2} .0114536{col 37}{space 1}   -2.94{col 46}{space 3}0.003{col 54}{space 4}  .943583{col 67}{space 3} .9884843
+{txt}{space 10}3  {c |}{col 14}{res}{space 2} .9339428{col 26}{space 2} .0183428{col 37}{space 1}   -3.48{col 46}{space 3}0.001{col 54}{space 4} .8986748{col 67}{space 3} .9705949
+{txt}{space 10}4  {c |}{col 14}{res}{space 2} 1.006969{col 26}{space 2} .0343983{col 37}{space 1}    0.20{col 46}{space 3}0.839{col 54}{space 4} .9417567{col 67}{space 3} 1.076696
+{txt}{space 10}5  {c |}{col 14}{res}{space 2} .8797101{col 26}{space 2}  .083951{col 37}{space 1}   -1.34{col 46}{space 3}0.179{col 54}{space 4}  .729641{col 67}{space 3} 1.060645
+{txt}{space 10}6  {c |}{col 14}{res}{space 2}  1.10693{col 26}{space 2} .2859952{col 37}{space 1}    0.39{col 46}{space 3}0.694{col 54}{space 4} .6671094{col 67}{space 3} 1.836722
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0723581{col 26}{space 2} .0017918{col 37}{space 1} -106.05{col 46}{space 3}0.000{col 54}{space 4} .0689301{col 67}{space 3} .0759566
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. estimates store BASE_MODEL
+{txt}
+{com}. 
+. * alternative model with interactions, using 24 more degrees of freedom
+. xi: logistic voted treat1##c.numvotes treat2##c.numvotes treat3##c.numvotes treat4##c.numvotes treat1##i.hh_size treat2##i.hh_size treat3##i.hh_size treat4##i.hh_size
+{txt}note: numvotes omitted because of collinearity
+note: numvotes omitted because of collinearity
+note: numvotes omitted because of collinearity
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   180,002
+{txt}{col 49}LR chi2({res}34{txt}){col 67}= {res}   9666.04
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-108607.93{txt}{col 49}Pseudo R2{col 67}= {res}    0.0426
+
+{txt}{hline 18}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}            voted{col 19}{c |} Odds Ratio{col 31}   Std. Err.{col 43}      z{col 51}   P>|z|{col 59}     [95% Con{col 72}f. Interval]
+{hline 18}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}1.treat1 {c |}{col 19}{res}{space 2} 1.125936{col 31}{space 2}  .089705{col 42}{space 1}    1.49{col 51}{space 3}0.137{col 59}{space 4} .9631575{col 72}{space 3} 1.316225
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2} 1.600338{col 31}{space 2} .0116085{col 42}{space 1}   64.82{col 51}{space 3}0.000{col 59}{space 4} 1.577747{col 72}{space 3} 1.623253
+{txt}{space 17} {c |}
+treat1#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} 1.015802{col 31}{space 2} .0178122{col 42}{space 1}    0.89{col 51}{space 3}0.371{col 59}{space 4} .9814839{col 72}{space 3}  1.05132
+{txt}{space 17} {c |}
+{space 9}1.treat2 {c |}{col 19}{res}{space 2} 1.175328{col 31}{space 2} .0937008{col 42}{space 1}    2.03{col 51}{space 3}0.043{col 59}{space 4} 1.005306{col 72}{space 3} 1.374103
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat2#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9868843{col 31}{space 2} .0172724{col 42}{space 1}   -0.75{col 51}{space 3}0.451{col 59}{space 4} .9536051{col 72}{space 3} 1.021325
+{txt}{space 17} {c |}
+{space 9}1.treat3 {c |}{col 19}{res}{space 2} 1.584293{col 31}{space 2} .1207441{col 42}{space 1}    6.04{col 51}{space 3}0.000{col 59}{space 4} 1.364466{col 72}{space 3} 1.839536
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat3#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2}  .988193{col 31}{space 2} .0166234{col 42}{space 1}   -0.71{col 51}{space 3}0.480{col 59}{space 4}  .956143{col 72}{space 3} 1.021317
+{txt}{space 17} {c |}
+{space 9}1.treat4 {c |}{col 19}{res}{space 2} 1.399516{col 31}{space 2} .1086394{col 42}{space 1}    4.33{col 51}{space 3}0.000{col 59}{space 4} 1.201993{col 72}{space 3} 1.629497
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat4#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9939336{col 31}{space 2} .0169799{col 42}{space 1}   -0.36{col 51}{space 3}0.722{col 59}{space 4} .9612046{col 72}{space 3} 1.027777
+{txt}{space 17} {c |}
+{space 10}hh_size {c |}
+{space 15}2  {c |}{col 19}{res}{space 2} .9891565{col 31}{space 2} .0159876{col 42}{space 1}   -0.67{col 51}{space 3}0.500{col 59}{space 4} .9583125{col 72}{space 3} 1.020993
+{txt}{space 15}3  {c |}{col 19}{res}{space 2} .9646171{col 31}{space 2} .0257485{col 42}{space 1}   -1.35{col 51}{space 3}0.177{col 59}{space 4} .9154484{col 72}{space 3} 1.016427
+{txt}{space 15}4  {c |}{col 19}{res}{space 2} 1.020413{col 31}{space 2} .0478641{col 42}{space 1}    0.43{col 51}{space 3}0.667{col 59}{space 4} .9307846{col 72}{space 3} 1.118673
+{txt}{space 15}5  {c |}{col 19}{res}{space 2} .8896006{col 31}{space 2} .1176697{col 42}{space 1}   -0.88{col 51}{space 3}0.376{col 59}{space 4}  .686443{col 72}{space 3} 1.152884
+{txt}{space 15}6  {c |}{col 19}{res}{space 2} 1.569882{col 31}{space 2} .5326661{col 42}{space 1}    1.33{col 51}{space 3}0.184{col 59}{space 4} .8073306{col 72}{space 3} 3.052688
+{txt}{space 17} {c |}
+{space 3}treat1#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2}  .913373{col 31}{space 2} .0355065{col 42}{space 1}   -2.33{col 51}{space 3}0.020{col 59}{space 4} .8463665{col 72}{space 3} .9856843
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .9966022{col 31}{space 2} .0645094{col 42}{space 1}   -0.05{col 51}{space 3}0.958{col 59}{space 4} .8778578{col 72}{space 3} 1.131409
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} 1.085218{col 31}{space 2} .1186707{col 42}{space 1}    0.75{col 51}{space 3}0.455{col 59}{space 4} .8758632{col 72}{space 3} 1.344613
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .9266475{col 31}{space 2} .3186331{col 42}{space 1}   -0.22{col 51}{space 3}0.825{col 59}{space 4} .4723066{col 72}{space 3} 1.818047
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .8658195{col 31}{space 2} .6295116{col 42}{space 1}   -0.20{col 51}{space 3}0.843{col 59}{space 4} .2082303{col 72}{space 3} 3.600068
+{txt}{space 17} {c |}
+{space 3}treat2#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2} .9873338{col 31}{space 2} .0384175{col 42}{space 1}   -0.33{col 51}{space 3}0.743{col 59}{space 4} .9148365{col 72}{space 3} 1.065576
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .9471061{col 31}{space 2} .0606525{col 42}{space 1}   -0.85{col 51}{space 3}0.396{col 59}{space 4} .8353873{col 72}{space 3} 1.073765
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2}  .991982{col 31}{space 2} .1114947{col 42}{space 1}   -0.07{col 51}{space 3}0.943{col 59}{space 4} .7958519{col 72}{space 3} 1.236447
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .9720191{col 31}{space 2} .2956322{col 42}{space 1}   -0.09{col 51}{space 3}0.926{col 59}{space 4} .5355357{col 72}{space 3} 1.764254
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .2111563{col 31}{space 2} .2443041{col 42}{space 1}   -1.34{col 51}{space 3}0.179{col 59}{space 4} .0218665{col 72}{space 3} 2.039056
+{txt}{space 17} {c |}
+{space 3}treat3#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2} .9857914{col 31}{space 2} .0373339{col 42}{space 1}   -0.38{col 51}{space 3}0.706{col 59}{space 4} .9152681{col 72}{space 3} 1.061749
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .9134149{col 31}{space 2} .0575257{col 42}{space 1}   -1.44{col 51}{space 3}0.150{col 59}{space 4} .8073476{col 72}{space 3} 1.033417
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .9427656{col 31}{space 2} .1012495{col 42}{space 1}   -0.55{col 51}{space 3}0.583{col 59}{space 4} .7638145{col 72}{space 3} 1.163643
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} 1.198653{col 31}{space 2} .3306976{col 42}{space 1}    0.66{col 51}{space 3}0.511{col 59}{space 4} .6979989{col 72}{space 3} 2.058412
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .3272005{col 31}{space 2} .2565305{col 42}{space 1}   -1.42{col 51}{space 3}0.154{col 59}{space 4} .0703814{col 72}{space 3} 1.521142
+{txt}{space 17} {c |}
+{space 3}treat4#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2} .9122355{col 31}{space 2}  .034978{col 42}{space 1}   -2.40{col 51}{space 3}0.017{col 59}{space 4} .8461926{col 72}{space 3} .9834329
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .8797087{col 31}{space 2} .0559434{col 42}{space 1}   -2.02{col 51}{space 3}0.044{col 59}{space 4} .7766196{col 72}{space 3} .9964818
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .8756286{col 31}{space 2} .0980147{col 42}{space 1}   -1.19{col 51}{space 3}0.235{col 59}{space 4} .7031364{col 72}{space 3} 1.090436
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .7802305{col 31}{space 2} .2496299{col 42}{space 1}   -0.78{col 51}{space 3}0.438{col 59}{space 4} .4167603{col 72}{space 3} 1.460695
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .5038748{col 31}{space 2} .6405244{col 42}{space 1}   -0.54{col 51}{space 3}0.590{col 59}{space 4} .0417136{col 72}{space 3} 6.086505
+{txt}{space 17} {c |}
+{space 12}_cons {c |}{col 19}{res}{space 2} .0705548{col 31}{space 2} .0023391{col 42}{space 1}  -79.97{col 51}{space 3}0.000{col 59}{space 4}  .066116{col 72}{space 3} .0752916
+{txt}{hline 18}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. estimates store ALTERNATIVE_MODEL
+{txt}
+{com}. lrtest ALTERNATIVE_MODEL BASE_MODEL
+
+{txt}Likelihood-ratio test{col 55}LR chi2({res}24{txt}){col 67}={res}     24.36
+{txt}(Assumption: {res}{stata est replay BASE_MODEL:BASE_MODEL}{txt} nested in {res}{stata est replay ALTERNATIVE_MODEL:ALTERNATIVE_~L}{txt}){col 55}Prob > chi2 = {res}   0.4412
+{txt}
+{com}. 
+. 
+. ****************************************************
+. *   Repeat samping step to obtain average results
+. ****************************************************
+. 
+. cd "/Users/dongreen/Dropbox/Social Pressure pubs/ETOV 2006"
+{res}/Users/dongreen/Dropbox/Social Pressure pubs/ETOV 2006
+{txt}
+{com}. use "GerberGreenLarimer_APSR_2008_social_pressure.dta", clear
+{txt}
+{com}. 
+. * create treatment indicators
+. xi: logistic voted i.treatment
+{txt}i.treatment{col 19}_Itreatment_0-4{col 39}(naturally coded; _Itreatment_0 omitted)
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}4{txt}){col 67}= {res}   1148.32
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-214044.79{txt}{col 49}Pseudo R2{col 67}= {res}    0.0027
+
+{txt}{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        voted{col 15}{c |} Odds Ratio{col 27}   Std. Err.{col 39}      z{col 47}   P>|z|{col 55}     [95% Con{col 68}f. Interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+_Itreatment_1 {c |}{col 15}{res}{space 2} 1.128035{col 27}{space 2} .0135779{col 38}{space 1}   10.01{col 47}{space 3}0.000{col 55}{space 4} 1.101734{col 68}{space 3} 1.154964
+{txt}_Itreatment_2 {c |}{col 15}{res}{space 2} 1.088029{col 27}{space 2} .0131657{col 38}{space 1}    6.97{col 47}{space 3}0.000{col 55}{space 4} 1.062528{col 68}{space 3} 1.114142
+{txt}_Itreatment_3 {c |}{col 15}{res}{space 2} 1.440646{col 27}{space 2} .0168257{col 38}{space 1}   31.26{col 47}{space 3}0.000{col 55}{space 4} 1.408043{col 68}{space 3} 1.474004
+{txt}_Itreatment_4 {c |}{col 15}{res}{space 2} 1.249742{col 27}{space 2} .0148308{col 38}{space 1}   18.79{col 47}{space 3}0.000{col 55}{space 4}  1.22101{col 68}{space 3} 1.279151
+{txt}{space 8}_cons {c |}{col 15}{res}{space 2} .4217436{col 27}{space 2} .0021113{col 38}{space 1} -172.46{col 47}{space 3}0.000{col 55}{space 4} .4176258{col 68}{space 3} .4259021
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. 
+. gen treat1= _Itreatment_1
+{txt}
+{com}. gen treat2= _Itreatment_2
+{txt}
+{com}. gen treat3= _Itreatment_3
+{txt}
+{com}. gen treat4= _Itreatment_4
+{txt}
+{com}. 
+. * note that there are six categories of past vote history (because g2004 is always 1)
+. gen numvotes= g2000+g2002 +g2004+ p2000+ p2002+ p2004
+{txt}
+{com}. tab numvotes
+
+   {txt}numvotes {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          1 {c |}{res}     21,784        6.33        6.33
+{txt}          2 {c |}{res}     26,060        7.57       13.90
+{txt}          3 {c |}{res}     80,436       23.38       37.28
+{txt}          4 {c |}{res}    136,031       39.53       76.82
+{txt}          5 {c |}{res}     65,852       19.14       95.95
+{txt}          6 {c |}{res}     13,921        4.05      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}    344,084      100.00
+{txt}
+{com}. 
+. 
+. * set the number of replications to be the same as the number of loops
+. set matsize 10000
+{txt}
+{com}. cap matrix drop chi2s
+{txt}
+{com}. matrix chi2s=J(1000, 1, .)
+{txt}
+{com}. 
+. 
+. local j = 0
+{txt}
+{com}. local i = 1
+{txt}
+{com}. while `i' < 1001 {c -(}
+{txt}  2{com}.         set seed 123`j'
+{txt}  3{com}.         preserve
+{txt}  4{com}.         qui sample 1,count by(hh_id)
+{txt}  5{com}.         qui replace hh_size=6 if hh_size > 6
+{txt}  6{com}. 
+.         * base model (clustering is irrelevant when one person is sampled per household)
+.         qui logistic voted treat1 treat2 treat3 treat4 numvotes i.hh_size
+{txt}  7{com}.         local n1 = e(N)
+{txt}  8{com}.         estimates store BASE_MODEL
+{txt}  9{com}.         
+.         * alternative model with interactions, using 24 more degrees of freedom
+.         qui xi: logistic voted treat1##c.numvotes treat2##c.numvotes treat3##c.numvotes         treat4##c.numvotes treat1##i.hh_size treat2##i.hh_size treat3##i.hh_size        treat4##i.hh_size
+{txt} 10{com}.         local n2 = e(N)
+{txt} 11{com}.         estimates store ALTERNATIVE_MODEL
+{txt} 12{com}. 
+.         if `n1' == `n2'{c -(}
+{txt} 13{com}.                 * di "Results from draw number `i'"
+.                 qui lrtest ALTERNATIVE_MODEL BASE_MODEL
+{txt} 14{com}.                 matrix chi2s[`i',1] = r(chi2) 
+{txt} 15{com}.                 local i = `i' +1
+{txt} 16{com}.         {c )-}
+{txt} 17{com}.         
+.         restore 
+{txt} 18{com}.         local j = `j' +1        
+{txt} 19{com}. {c )-}
+{txt}
+{com}. 
+. *** reports the p-value for the average chi2
+. preserve
+{txt}
+{com}. clear
+{txt}
+{com}. svmat chi2s
+{txt}number of observations will be reset to 1000
+Press any key to continue, or Break to abort
+{p}
+number of observations (_N)  was 0,
+now 1,000
+{p_end}
+
+{com}. summarize chi2s
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 6}chi2s1 {c |}{res}      1,000    32.01548    6.085829   16.41674   53.00667
+{txt}
+{com}. 
+. global avg_chi2 = r(mean)
+{txt}
+{com}. di "average chi2: " $avg_chi2
+{res}average chi2: 32.015475
+{txt}
+{com}. disp "p-value: " chi2tail(24, $avg_chi2)
+{res}p-value: .12660937
+{txt}
+{com}. restore
+{txt}
+{com}. 
+. ***********************************************************************************************************************
+. * PART 2: LR Test for the entire subject pool, ignoring clustering, with and without randomly generated junk treatments
+. ***********************************************************************************************************************
+. 
+. * use data from ISPS Archive
+. cd "/Users/dongreen/Dropbox/Social Pressure pubs/ETOV 2006"
+{res}/Users/dongreen/Dropbox/Social Pressure pubs/ETOV 2006
+{txt}
+{com}. use "GerberGreenLarimer_APSR_2008_social_pressure.dta", clear
+{txt}
+{com}. 
+. xi: logistic voted i.treatment
+{txt}i.treatment{col 19}_Itreatment_0-4{col 39}(naturally coded; _Itreatment_0 omitted)
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}4{txt}){col 67}= {res}   1148.32
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-214044.79{txt}{col 49}Pseudo R2{col 67}= {res}    0.0027
+
+{txt}{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        voted{col 15}{c |} Odds Ratio{col 27}   Std. Err.{col 39}      z{col 47}   P>|z|{col 55}     [95% Con{col 68}f. Interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+_Itreatment_1 {c |}{col 15}{res}{space 2} 1.128035{col 27}{space 2} .0135779{col 38}{space 1}   10.01{col 47}{space 3}0.000{col 55}{space 4} 1.101734{col 68}{space 3} 1.154964
+{txt}_Itreatment_2 {c |}{col 15}{res}{space 2} 1.088029{col 27}{space 2} .0131657{col 38}{space 1}    6.97{col 47}{space 3}0.000{col 55}{space 4} 1.062528{col 68}{space 3} 1.114142
+{txt}_Itreatment_3 {c |}{col 15}{res}{space 2} 1.440646{col 27}{space 2} .0168257{col 38}{space 1}   31.26{col 47}{space 3}0.000{col 55}{space 4} 1.408043{col 68}{space 3} 1.474004
+{txt}_Itreatment_4 {c |}{col 15}{res}{space 2} 1.249742{col 27}{space 2} .0148308{col 38}{space 1}   18.79{col 47}{space 3}0.000{col 55}{space 4}  1.22101{col 68}{space 3} 1.279151
+{txt}{space 8}_cons {c |}{col 15}{res}{space 2} .4217436{col 27}{space 2} .0021113{col 38}{space 1} -172.46{col 47}{space 3}0.000{col 55}{space 4} .4176258{col 68}{space 3} .4259021
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. 
+. gen treat1= _Itreatment_1
+{txt}
+{com}. gen treat2= _Itreatment_2
+{txt}
+{com}. gen treat3= _Itreatment_3
+{txt}
+{com}. gen treat4= _Itreatment_4
+{txt}
+{com}. 
+. gen numvotes= g2000+g2002 +g2004+ p2000+ p2002+ p2004
+{txt}
+{com}. 
+. * recode hh_size because otherwise the number of observations may differ across the two regressions due to sparse N
+. replace hh_size=6 if hh_size > 6
+{txt}(57 real changes made)
+
+{com}. tab hh_size
+
+  {txt}number of {c |}
+  people in {c |}
+  household {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          1 {c |}{res}     47,834       13.90       13.90
+{txt}          2 {c |}{res}    214,086       62.22       76.12
+{txt}          3 {c |}{res}     57,474       16.70       92.82
+{txt}          4 {c |}{res}     20,916        6.08       98.90
+{txt}          5 {c |}{res}      3,315        0.96       99.87
+{txt}          6 {c |}{res}        459        0.13      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}    344,084      100.00
+{txt}
+{com}. 
+. **** NAIVE LR test that ignores clustering ****
+. 
+. * base model (main effects)
+. logistic voted treat1 treat2 treat3 treat4 numvotes i.hh_size
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}10{txt}){col 67}= {res}  24154.46
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-202541.72{txt}{col 49}Pseudo R2{col 67}= {res}    0.0563
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}       voted{col 14}{c |} Odds Ratio{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}treat1 {c |}{col 14}{res}{space 2} 1.131431{col 26}{space 2} .0140759{col 37}{space 1}    9.93{col 46}{space 3}0.000{col 54}{space 4} 1.104176{col 67}{space 3} 1.159358
+{txt}{space 6}treat2 {c |}{col 14}{res}{space 2} 1.093989{col 26}{space 2} .0136835{col 37}{space 1}    7.18{col 46}{space 3}0.000{col 54}{space 4} 1.067496{col 67}{space 3}  1.12114
+{txt}{space 6}treat3 {c |}{col 14}{res}{space 2} 1.476877{col 26}{space 2} .0178835{col 37}{space 1}   32.20{col 46}{space 3}0.000{col 54}{space 4} 1.442239{col 67}{space 3} 1.512348
+{txt}{space 6}treat4 {c |}{col 14}{res}{space 2} 1.267318{col 26}{space 2} .0155729{col 37}{space 1}   19.28{col 46}{space 3}0.000{col 54}{space 4}  1.23716{col 67}{space 3} 1.298211
+{txt}{space 4}numvotes {c |}{col 14}{res}{space 2} 1.678979{col 26}{space 2} .0062356{col 37}{space 1}  139.52{col 46}{space 3}0.000{col 54}{space 4} 1.666802{col 67}{space 3} 1.691245
+{txt}{space 12} {c |}
+{space 5}hh_size {c |}
+{space 10}2  {c |}{col 14}{res}{space 2} .9818825{col 26}{space 2} .0106805{col 37}{space 1}   -1.68{col 46}{space 3}0.093{col 54}{space 4} .9611707{col 67}{space 3} 1.003041
+{txt}{space 10}3  {c |}{col 14}{res}{space 2} .9420437{col 26}{space 2}  .013145{col 37}{space 1}   -4.28{col 46}{space 3}0.000{col 54}{space 4} .9166292{col 67}{space 3} .9681629
+{txt}{space 10}4  {c |}{col 14}{res}{space 2} 1.014009{col 26}{space 2} .0195232{col 37}{space 1}    0.72{col 46}{space 3}0.470{col 54}{space 4} .9764572{col 67}{space 3} 1.053005
+{txt}{space 10}5  {c |}{col 14}{res}{space 2} .9337388{col 26}{space 2} .0405888{col 37}{space 1}   -1.58{col 46}{space 3}0.115{col 54}{space 4} .8574809{col 67}{space 3} 1.016779
+{txt}{space 10}6  {c |}{col 14}{res}{space 2} 1.552002{col 26}{space 2} .1624988{col 37}{space 1}    4.20{col 46}{space 3}0.000{col 54}{space 4} 1.264064{col 67}{space 3} 1.905528
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0588975{col 26}{space 2}  .001103{col 37}{space 1} -151.22{col 46}{space 3}0.000{col 54}{space 4} .0567749{col 67}{space 3} .0610995
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. estimates store BASE_MODEL_ALL
+{txt}
+{com}. 
+. * alternative model (treatment by numvotes interactions and treatment by hh_size interactions)
+. xi: logistic voted treat1##c.numvotes treat2##c.numvotes treat3##c.numvotes treat4##c.numvotes treat1##i.hh_size treat2##i.hh_size treat3##i.hh_size treat4##i.hh_size
+{txt}note: numvotes omitted because of collinearity
+note: numvotes omitted because of collinearity
+note: numvotes omitted because of collinearity
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}34{txt}){col 67}= {res}  24212.77
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-202512.56{txt}{col 49}Pseudo R2{col 67}= {res}    0.0564
+
+{txt}{hline 18}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}            voted{col 19}{c |} Odds Ratio{col 31}   Std. Err.{col 43}      z{col 51}   P>|z|{col 59}     [95% Con{col 72}f. Interval]
+{hline 18}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}1.treat1 {c |}{col 19}{res}{space 2} 1.135478{col 31}{space 2} .0686572{col 42}{space 1}    2.10{col 51}{space 3}0.036{col 59}{space 4}  1.00858{col 72}{space 3} 1.278342
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2} 1.687361{col 31}{space 2} .0085614{col 42}{space 1}  103.11{col 51}{space 3}0.000{col 59}{space 4} 1.670664{col 72}{space 3} 1.704225
+{txt}{space 17} {c |}
+treat1#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} 1.014151{col 31}{space 2} .0124695{col 42}{space 1}    1.14{col 51}{space 3}0.253{col 59}{space 4} .9900038{col 72}{space 3} 1.038888
+{txt}{space 17} {c |}
+{space 9}1.treat2 {c |}{col 19}{res}{space 2} 1.210442{col 31}{space 2} .0728809{col 42}{space 1}    3.17{col 51}{space 3}0.002{col 59}{space 4} 1.075705{col 72}{space 3} 1.362056
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat2#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9801452{col 31}{space 2} .0119584{col 42}{space 1}   -1.64{col 51}{space 3}0.100{col 59}{space 4} .9569851{col 72}{space 3} 1.003866
+{txt}{space 17} {c |}
+{space 9}1.treat3 {c |}{col 19}{res}{space 2} 1.598276{col 31}{space 2} .0925191{col 42}{space 1}    8.10{col 51}{space 3}0.000{col 59}{space 4}  1.42685{col 72}{space 3} 1.790297
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat3#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9869326{col 31}{space 2} .0116173{col 42}{space 1}   -1.12{col 51}{space 3}0.264{col 59}{space 4} .9644237{col 72}{space 3} 1.009967
+{txt}{space 17} {c |}
+{space 9}1.treat4 {c |}{col 19}{res}{space 2} 1.511931{col 31}{space 2} .0885662{col 42}{space 1}    7.06{col 51}{space 3}0.000{col 59}{space 4} 1.347938{col 72}{space 3} 1.695875
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat4#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9761504{col 31}{space 2} .0115855{col 42}{space 1}   -2.03{col 51}{space 3}0.042{col 59}{space 4} .9537053{col 72}{space 3} .9991236
+{txt}{space 17} {c |}
+{space 10}hh_size {c |}
+{space 15}2  {c |}{col 19}{res}{space 2}  1.00053{col 31}{space 2}  .014844{col 42}{space 1}    0.04{col 51}{space 3}0.972{col 59}{space 4} .9718554{col 72}{space 3} 1.030051
+{txt}{space 15}3  {c |}{col 19}{res}{space 2} .9854137{col 31}{space 2} .0186942{col 42}{space 1}   -0.77{col 51}{space 3}0.439{col 59}{space 4} .9494466{col 72}{space 3} 1.022743
+{txt}{space 15}4  {c |}{col 19}{res}{space 2} 1.064013{col 31}{space 2} .0279394{col 42}{space 1}    2.36{col 51}{space 3}0.018{col 59}{space 4} 1.010638{col 72}{space 3} 1.120207
+{txt}{space 15}5  {c |}{col 19}{res}{space 2} .9754859{col 31}{space 2} .0582202{col 42}{space 1}   -0.42{col 51}{space 3}0.678{col 59}{space 4} .8677976{col 72}{space 3} 1.096538
+{txt}{space 15}6  {c |}{col 19}{res}{space 2}  1.70453{col 31}{space 2} .2435003{col 42}{space 1}    3.73{col 51}{space 3}0.000{col 59}{space 4} 1.288269{col 72}{space 3} 2.255293
+{txt}{space 17} {c |}
+{space 3}treat1#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2} .9278668{col 31}{space 2}    .0331{col 42}{space 1}   -2.10{col 51}{space 3}0.036{col 59}{space 4}  .865208{col 72}{space 3} .9950635
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .9304341{col 31}{space 2} .0428307{col 42}{space 1}   -1.57{col 51}{space 3}0.117{col 59}{space 4}  .850163{col 72}{space 3} 1.018284
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .9970601{col 31}{space 2}  .062143{col 42}{space 1}   -0.05{col 51}{space 3}0.962{col 59}{space 4} .8824073{col 72}{space 3}  1.12661
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .9685101{col 31}{space 2} .1460316{col 42}{space 1}   -0.21{col 51}{space 3}0.832{col 59}{space 4} .7207096{col 72}{space 3} 1.301512
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .8963709{col 31}{space 2} .2746912{col 42}{space 1}   -0.36{col 51}{space 3}0.721{col 59}{space 4} .4916303{col 72}{space 3} 1.634319
+{txt}{space 17} {c |}
+{space 3}treat2#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2} 1.003073{col 31}{space 2} .0357334{col 42}{space 1}    0.09{col 51}{space 3}0.931{col 59}{space 4} .9354255{col 72}{space 3} 1.075612
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .9176074{col 31}{space 2} .0419204{col 42}{space 1}   -1.88{col 51}{space 3}0.060{col 59}{space 4} .8390161{col 72}{space 3} 1.003561
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .8670558{col 31}{space 2} .0553346{col 42}{space 1}   -2.24{col 51}{space 3}0.025{col 59}{space 4} .7651107{col 72}{space 3} .9825842
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .6488842{col 31}{space 2} .0975311{col 42}{space 1}   -2.88{col 51}{space 3}0.004{col 59}{space 4} .4833109{col 72}{space 3} .8711798
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} 1.083977{col 31}{space 2} .3747325{col 42}{space 1}    0.23{col 51}{space 3}0.816{col 59}{space 4} .5505017{col 72}{space 3} 2.134429
+{txt}{space 17} {c |}
+{space 3}treat3#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2}  .992444{col 31}{space 2} .0344955{col 42}{space 1}   -0.22{col 51}{space 3}0.827{col 59}{space 4} .9270855{col 72}{space 3}  1.06241
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .8872956{col 31}{space 2} .0397786{col 42}{space 1}   -2.67{col 51}{space 3}0.008{col 59}{space 4}  .812658{col 72}{space 3} .9687882
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .8952189{col 31}{space 2} .0546593{col 42}{space 1}   -1.81{col 51}{space 3}0.070{col 59}{space 4} .7942505{col 72}{space 3} 1.009023
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} 1.179139{col 31}{space 2} .1497255{col 42}{space 1}    1.30{col 51}{space 3}0.194{col 59}{space 4} .9193498{col 72}{space 3}  1.51234
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .6177137{col 31}{space 2} .1856889{col 42}{space 1}   -1.60{col 51}{space 3}0.109{col 59}{space 4} .3426971{col 72}{space 3} 1.113433
+{txt}{space 17} {c |}
+{space 3}treat4#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2}  .918181{col 31}{space 2} .0322661{col 42}{space 1}   -2.43{col 51}{space 3}0.015{col 59}{space 4} .8570693{col 72}{space 3} .9836501
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .8920371{col 31}{space 2} .0400526{col 42}{space 1}   -2.54{col 51}{space 3}0.011{col 59}{space 4} .8168905{col 72}{space 3} .9740965
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2}  .847649{col 31}{space 2} .0530439{col 42}{space 1}   -2.64{col 51}{space 3}0.008{col 59}{space 4} .7498076{col 72}{space 3} .9582575
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .8518758{col 31}{space 2} .1216282{col 42}{space 1}   -1.12{col 51}{space 3}0.262{col 59}{space 4} .6439385{col 72}{space 3} 1.126959
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .9028049{col 31}{space 2} .4625951{col 42}{space 1}   -0.20{col 51}{space 3}0.842{col 59}{space 4} .3307046{col 72}{space 3} 2.464606
+{txt}{space 17} {c |}
+{space 12}_cons {c |}{col 19}{res}{space 2} .0565035{col 31}{space 2} .0014194{col 42}{space 1} -114.39{col 51}{space 3}0.000{col 59}{space 4}  .053789{col 72}{space 3} .0593551
+{txt}{hline 18}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. estimates store ALTERNATIVE_MODEL1
+{txt}
+{com}. 
+. * Note that this test is misleading because it ignores clustered assignment
+. lrtest ALTERNATIVE_MODEL1 BASE_MODEL_ALL
+
+{txt}Likelihood-ratio test{col 55}LR chi2({res}24{txt}){col 67}={res}     58.31
+{txt}(Assumption: {res}{stata est replay BASE_MODEL_ALL:BASE_MODEL_ALL}{txt} nested in {res}{stata est replay ALTERNATIVE_MODEL1:ALTERNATIVE_~1}{txt}){col 55}Prob > chi2 = {res}   0.0001
+{txt}
+{com}. 
+. **** another naive LR test that ignores clustering ****
+. * This time create faux random treatment assignments at the cluster (hh_id) level.
+. * Use these random assignments (called junk*) to create faux treatment dummies.
+. * LR test includes junk variables' MAIN EFFECTS ONLY in BOTH base and alternative models
+. * ssc install randomizr
+. set seed 123
+{txt}
+{com}. cluster_ra Z_clust, cluster_var(hh_id) m_each(100000 20000 20000 20000 20002) replace
+{res}{txt}
+{com}. gen junk = Z_clust
+{txt}
+{com}. tab junk
+
+       {txt}junk {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          1 {c |}{res}    191,167       55.56       55.56
+{txt}          2 {c |}{res}     38,342       11.14       66.70
+{txt}          3 {c |}{res}     38,260       11.12       77.82
+{txt}          4 {c |}{res}     38,098       11.07       88.89
+{txt}          5 {c |}{res}     38,217       11.11      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}    344,084      100.00
+{txt}
+{com}. xi: logistic voted i.junk
+{txt}i.junk{col 19}_Ijunk_1-5{col 39}(naturally coded; _Ijunk_1 omitted)
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}4{txt}){col 67}= {res}     13.31
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0098
+{txt}Log likelihood = {res}-214612.29{txt}{col 49}Pseudo R2{col 67}= {res}    0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}       voted{col 14}{c |} Odds Ratio{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 4}_Ijunk_2 {c |}{col 14}{res}{space 2} 1.026794{col 26}{space 2} .0123289{col 37}{space 1}    2.20{col 46}{space 3}0.028{col 54}{space 4} 1.002912{col 67}{space 3} 1.051245
+{txt}{space 4}_Ijunk_3 {c |}{col 14}{res}{space 2} 1.038834{col 26}{space 2} .0124629{col 37}{space 1}    3.18{col 46}{space 3}0.001{col 54}{space 4} 1.014692{col 67}{space 3}  1.06355
+{txt}{space 4}_Ijunk_4 {c |}{col 14}{res}{space 2} 1.007955{col 26}{space 2}  .012169{col 37}{space 1}    0.66{col 46}{space 3}0.512{col 54}{space 4}  .984384{col 67}{space 3}  1.03209
+{txt}{space 4}_Ijunk_5 {c |}{col 14}{res}{space 2} 1.001914{col 26}{space 2} .0120915{col 37}{space 1}    0.16{col 46}{space 3}0.874{col 54}{space 4} .9784933{col 67}{space 3} 1.025896
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .4579545{col 26}{space 2} .0022566{col 37}{space 1} -158.50{col 46}{space 3}0.000{col 54}{space 4}  .453553{col 67}{space 3} .4623988
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. gen junk1= _Ijunk_2
+{txt}
+{com}. gen junk2= _Ijunk_3
+{txt}
+{com}. gen junk3= _Ijunk_4
+{txt}
+{com}. gen junk4= _Ijunk_5
+{txt}
+{com}. 
+. * LR test under null (adds four junk-treatment dummies)
+. * base model (main effects)
+. logistic voted treat1 treat2 treat3 treat4 numvotes i.hh_size junk1 junk2 junk3 junk4
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}14{txt}){col 67}= {res}  24167.30
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-202535.29{txt}{col 49}Pseudo R2{col 67}= {res}    0.0563
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}       voted{col 14}{c |} Odds Ratio{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}treat1 {c |}{col 14}{res}{space 2} 1.131742{col 26}{space 2} .0140804{col 37}{space 1}    9.95{col 46}{space 3}0.000{col 54}{space 4} 1.104479{col 67}{space 3} 1.159678
+{txt}{space 6}treat2 {c |}{col 14}{res}{space 2} 1.094067{col 26}{space 2}  .013685{col 37}{space 1}    7.19{col 46}{space 3}0.000{col 54}{space 4} 1.067572{col 67}{space 3} 1.121221
+{txt}{space 6}treat3 {c |}{col 14}{res}{space 2}  1.47683{col 26}{space 2} .0178833{col 37}{space 1}   32.20{col 46}{space 3}0.000{col 54}{space 4} 1.442192{col 67}{space 3}   1.5123
+{txt}{space 6}treat4 {c |}{col 14}{res}{space 2} 1.267422{col 26}{space 2}  .015575{col 37}{space 1}   19.28{col 46}{space 3}0.000{col 54}{space 4}  1.23726{col 67}{space 3} 1.298319
+{txt}{space 4}numvotes {c |}{col 14}{res}{space 2} 1.678981{col 26}{space 2} .0062358{col 37}{space 1}  139.52{col 46}{space 3}0.000{col 54}{space 4} 1.666804{col 67}{space 3} 1.691248
+{txt}{space 12} {c |}
+{space 5}hh_size {c |}
+{space 10}2  {c |}{col 14}{res}{space 2} .9818726{col 26}{space 2} .0106806{col 37}{space 1}   -1.68{col 46}{space 3}0.093{col 54}{space 4} .9611606{col 67}{space 3} 1.003031
+{txt}{space 10}3  {c |}{col 14}{res}{space 2} .9419467{col 26}{space 2} .0131439{col 37}{space 1}   -4.29{col 46}{space 3}0.000{col 54}{space 4} .9165342{col 67}{space 3} .9680637
+{txt}{space 10}4  {c |}{col 14}{res}{space 2} 1.013975{col 26}{space 2} .0195234{col 37}{space 1}    0.72{col 46}{space 3}0.471{col 54}{space 4} .9764232{col 67}{space 3} 1.052972
+{txt}{space 10}5  {c |}{col 14}{res}{space 2} .9328868{col 26}{space 2} .0405565{col 37}{space 1}   -1.60{col 46}{space 3}0.110{col 54}{space 4} .8566899{col 67}{space 3} 1.015861
+{txt}{space 10}6  {c |}{col 14}{res}{space 2}  1.55026{col 26}{space 2} .1623243{col 37}{space 1}    4.19{col 46}{space 3}0.000{col 54}{space 4} 1.262633{col 67}{space 3} 1.903408
+{txt}{space 12} {c |}
+{space 7}junk1 {c |}{col 14}{res}{space 2} 1.029351{col 26}{space 2} .0128022{col 37}{space 1}    2.33{col 46}{space 3}0.020{col 54}{space 4} 1.004563{col 67}{space 3} 1.054751
+{txt}{space 7}junk2 {c |}{col 14}{res}{space 2} 1.038101{col 26}{space 2}  .012899{col 37}{space 1}    3.01{col 46}{space 3}0.003{col 54}{space 4} 1.013125{col 67}{space 3} 1.063693
+{txt}{space 7}junk3 {c |}{col 14}{res}{space 2} 1.009009{col 26}{space 2} .0126131{col 37}{space 1}    0.72{col 46}{space 3}0.473{col 54}{space 4} .9845877{col 67}{space 3} 1.034035
+{txt}{space 7}junk4 {c |}{col 14}{res}{space 2} 1.001849{col 26}{space 2} .0125192{col 37}{space 1}    0.15{col 46}{space 3}0.883{col 54}{space 4} .9776094{col 67}{space 3} 1.026689
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0583914{col 26}{space 2} .0011118{col 37}{space 1} -149.18{col 46}{space 3}0.000{col 54}{space 4} .0562524{col 67}{space 3} .0606117
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. estimates store BASE_MODEL_JUNK
+{txt}
+{com}. 
+. * alternative model (adds junk-treatment dummies and usual interactions between treatment and numvotes and hh_size)
+. xi: logistic voted  junk1 junk2 junk3 junk4 treat1##c.numvotes treat2##c.numvotes treat3##c.numvotes treat4##c.numvotes treat1##i.hh_size treat2##i.hh_size treat3##i.hh_size treat4##i.hh_size
+{txt}note: numvotes omitted because of collinearity
+note: numvotes omitted because of collinearity
+note: numvotes omitted because of collinearity
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}38{txt}){col 67}= {res}  24225.63
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-202506.13{txt}{col 49}Pseudo R2{col 67}= {res}    0.0564
+
+{txt}{hline 18}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}            voted{col 19}{c |} Odds Ratio{col 31}   Std. Err.{col 43}      z{col 51}   P>|z|{col 59}     [95% Con{col 72}f. Interval]
+{hline 18}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 12}junk1 {c |}{col 19}{res}{space 2} 1.029877{col 31}{space 2} .0128106{col 42}{space 1}    2.37{col 51}{space 3}0.018{col 59}{space 4} 1.005073{col 72}{space 3} 1.055294
+{txt}{space 12}junk2 {c |}{col 19}{res}{space 2} 1.037798{col 31}{space 2} .0128983{col 42}{space 1}    2.99{col 51}{space 3}0.003{col 59}{space 4} 1.012824{col 72}{space 3} 1.063389
+{txt}{space 12}junk3 {c |}{col 19}{res}{space 2} 1.009133{col 31}{space 2} .0126176{col 42}{space 1}    0.73{col 51}{space 3}0.467{col 59}{space 4} .9847037{col 72}{space 3} 1.034169
+{txt}{space 12}junk4 {c |}{col 19}{res}{space 2} 1.001893{col 31}{space 2} .0125223{col 42}{space 1}    0.15{col 51}{space 3}0.880{col 59}{space 4} .9776475{col 72}{space 3} 1.026739
+{txt}{space 9}1.treat1 {c |}{col 19}{res}{space 2} 1.135299{col 31}{space 2} .0686467{col 42}{space 1}    2.10{col 51}{space 3}0.036{col 59}{space 4} 1.008421{col 72}{space 3} 1.278141
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2} 1.687333{col 31}{space 2} .0085615{col 42}{space 1}  103.10{col 51}{space 3}0.000{col 59}{space 4} 1.670636{col 72}{space 3} 1.704197
+{txt}{space 17} {c |}
+treat1#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} 1.014237{col 31}{space 2} .0124706{col 42}{space 1}    1.15{col 51}{space 3}0.250{col 59}{space 4} .9900873{col 72}{space 3} 1.038976
+{txt}{space 17} {c |}
+{space 9}1.treat2 {c |}{col 19}{res}{space 2} 1.210261{col 31}{space 2} .0728723{col 42}{space 1}    3.17{col 51}{space 3}0.002{col 59}{space 4}  1.07554{col 72}{space 3} 1.361858
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat2#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9801215{col 31}{space 2} .0119585{col 42}{space 1}   -1.65{col 51}{space 3}0.100{col 59}{space 4} .9569613{col 72}{space 3} 1.003842
+{txt}{space 17} {c |}
+{space 9}1.treat3 {c |}{col 19}{res}{space 2} 1.597942{col 31}{space 2} .0925038{col 42}{space 1}    8.10{col 51}{space 3}0.000{col 59}{space 4} 1.426546{col 72}{space 3} 1.789932
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat3#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9869495{col 31}{space 2} .0116182{col 42}{space 1}   -1.12{col 51}{space 3}0.264{col 59}{space 4}  .964439{col 72}{space 3} 1.009985
+{txt}{space 17} {c |}
+{space 9}1.treat4 {c |}{col 19}{res}{space 2} 1.511495{col 31}{space 2} .0885432{col 42}{space 1}    7.05{col 51}{space 3}0.000{col 59}{space 4} 1.347545{col 72}{space 3} 1.695391
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat4#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9762229{col 31}{space 2} .0115867{col 42}{space 1}   -2.03{col 51}{space 3}0.043{col 59}{space 4} .9537755{col 72}{space 3} .9991987
+{txt}{space 17} {c |}
+{space 10}hh_size {c |}
+{space 15}2  {c |}{col 19}{res}{space 2} 1.000436{col 31}{space 2} .0148429{col 42}{space 1}    0.03{col 51}{space 3}0.977{col 59}{space 4} .9717632{col 72}{space 3} 1.029954
+{txt}{space 15}3  {c |}{col 19}{res}{space 2} .9851031{col 31}{space 2} .0186888{col 42}{space 1}   -0.79{col 51}{space 3}0.429{col 59}{space 4} .9491463{col 72}{space 3} 1.022422
+{txt}{space 15}4  {c |}{col 19}{res}{space 2} 1.064266{col 31}{space 2}  .027947{col 42}{space 1}    2.37{col 51}{space 3}0.018{col 59}{space 4} 1.010877{col 72}{space 3} 1.120476
+{txt}{space 15}5  {c |}{col 19}{res}{space 2} .9746834{col 31}{space 2} .0581781{col 42}{space 1}   -0.43{col 51}{space 3}0.667{col 59}{space 4} .8670737{col 72}{space 3} 1.095648
+{txt}{space 15}6  {c |}{col 19}{res}{space 2} 1.702947{col 31}{space 2} .2432211{col 42}{space 1}    3.73{col 51}{space 3}0.000{col 59}{space 4} 1.287151{col 72}{space 3} 2.253061
+{txt}{space 17} {c |}
+{space 3}treat1#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2} .9280047{col 31}{space 2} .0331056{col 42}{space 1}   -2.09{col 51}{space 3}0.036{col 59}{space 4} .8653354{col 72}{space 3} .9952126
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .9309238{col 31}{space 2} .0428544{col 42}{space 1}   -1.55{col 51}{space 3}0.120{col 59}{space 4} .8506085{col 72}{space 3} 1.018823
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .9956563{col 31}{space 2} .0620613{col 42}{space 1}   -0.07{col 51}{space 3}0.944{col 59}{space 4} .8811551{col 72}{space 3} 1.125036
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .9682358{col 31}{space 2}  .146009{col 42}{space 1}   -0.21{col 51}{space 3}0.831{col 59}{space 4} .7204781{col 72}{space 3} 1.301192
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .8981939{col 31}{space 2} .2752652{col 42}{space 1}   -0.35{col 51}{space 3}0.726{col 59}{space 4} .4926136{col 72}{space 3} 1.637698
+{txt}{space 17} {c |}
+{space 3}treat2#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2}  1.00352{col 31}{space 2} .0357506{col 42}{space 1}    0.10{col 51}{space 3}0.921{col 59}{space 4} .9358406{col 72}{space 3} 1.076094
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2}  .917844{col 31}{space 2} .0419322{col 42}{space 1}   -1.88{col 51}{space 3}0.061{col 59}{space 4} .8392305{col 72}{space 3} 1.003822
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .8672671{col 31}{space 2} .0553522{col 42}{space 1}   -2.23{col 51}{space 3}0.026{col 59}{space 4}   .76529{col 72}{space 3} .9828329
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .6480644{col 31}{space 2} .0974142{col 42}{space 1}   -2.89{col 51}{space 3}0.004{col 59}{space 4}  .482691{col 72}{space 3} .8700958
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} 1.079788{col 31}{space 2} .3735164{col 42}{space 1}    0.22{col 51}{space 3}0.824{col 59}{space 4} .5481432{col 72}{space 3} 2.127076
+{txt}{space 17} {c |}
+{space 3}treat3#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2} .9925226{col 31}{space 2} .0344989{col 42}{space 1}   -0.22{col 51}{space 3}0.829{col 59}{space 4} .9271579{col 72}{space 3} 1.062496
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .8878449{col 31}{space 2} .0398042{col 42}{space 1}   -2.65{col 51}{space 3}0.008{col 59}{space 4} .8131595{col 72}{space 3} .9693898
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2}  .894329{col 31}{space 2} .0546066{col 42}{space 1}   -1.83{col 51}{space 3}0.067{col 59}{space 4} .7934582{col 72}{space 3} 1.008023
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} 1.181555{col 31}{space 2} .1500479{col 42}{space 1}    1.31{col 51}{space 3}0.189{col 59}{space 4} .9212091{col 72}{space 3} 1.515478
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .6180044{col 31}{space 2} .1857825{col 42}{space 1}   -1.60{col 51}{space 3}0.109{col 59}{space 4} .3428516{col 72}{space 3} 1.113979
+{txt}{space 17} {c |}
+{space 3}treat4#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2}   .91824{col 31}{space 2} .0322691{col 42}{space 1}   -2.43{col 51}{space 3}0.015{col 59}{space 4} .8571227{col 72}{space 3} .9837153
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .8924162{col 31}{space 2} .0400709{col 42}{space 1}   -2.53{col 51}{space 3}0.011{col 59}{space 4} .8172354{col 72}{space 3} .9745132
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .8475818{col 31}{space 2} .0530417{col 42}{space 1}   -2.64{col 51}{space 3}0.008{col 59}{space 4} .7497446{col 72}{space 3} .9581862
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .8502069{col 31}{space 2} .1214064{col 42}{space 1}   -1.14{col 51}{space 3}0.256{col 59}{space 4} .6426525{col 72}{space 3} 1.124794
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .9000349{col 31}{space 2}  .461359{col 42}{space 1}   -0.21{col 51}{space 3}0.837{col 59}{space 4} .3295585{col 72}{space 3} 2.458025
+{txt}{space 17} {c |}
+{space 12}_cons {c |}{col 19}{res}{space 2} .0560235{col 31}{space 2} .0014203{col 42}{space 1} -113.68{col 51}{space 3}0.000{col 59}{space 4} .0533077{col 72}{space 3} .0588776
+{txt}{hline 18}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. estimates store ALTERNATIVE_MODEL_JUNK
+{txt}
+{com}. * Note that this test is misleading because it ignores clustered assignment.
+. * The point of including it is to show that it generates a test statistic that is trivially different from the preceding LR test.
+. * The LR test statistic used below in the randomization inference step is the one without junk* indicators.
+. lrtest ALTERNATIVE_MODEL_JUNK BASE_MODEL_JUNK
+
+{txt}Likelihood-ratio test{col 55}LR chi2({res}24{txt}){col 67}={res}     58.33
+{txt}(Assumption: {res}{stata est replay BASE_MODEL_JUNK:BASE_MODEL_J~K}{txt} nested in {res}{stata est replay ALTERNATIVE_MODEL_JUNK:ALTERNATIVE_~K}{txt}){col 55}Prob > chi2 = {res}   0.0001
+{txt}
+{com}. 
+. 
+. *****************************************************************************************************************
+. * PART 3: LR Test using randomization inference to obtain the proper null distribution under clustered assignment
+. *****************************************************************************************************************
+. 
+. * use data from ISPS Archive
+. cd "/Users/dongreen/Dropbox/Social Pressure pubs/ETOV 2006"
+{res}/Users/dongreen/Dropbox/Social Pressure pubs/ETOV 2006
+{txt}
+{com}. use "GerberGreenLarimer_APSR_2008_social_pressure.dta", clear
+{txt}
+{com}. 
+. 
+. xi: logistic voted i.treatment
+{txt}i.treatment{col 19}_Itreatment_0-4{col 39}(naturally coded; _Itreatment_0 omitted)
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}4{txt}){col 67}= {res}   1148.32
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-214044.79{txt}{col 49}Pseudo R2{col 67}= {res}    0.0027
+
+{txt}{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        voted{col 15}{c |} Odds Ratio{col 27}   Std. Err.{col 39}      z{col 47}   P>|z|{col 55}     [95% Con{col 68}f. Interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+_Itreatment_1 {c |}{col 15}{res}{space 2} 1.128035{col 27}{space 2} .0135779{col 38}{space 1}   10.01{col 47}{space 3}0.000{col 55}{space 4} 1.101734{col 68}{space 3} 1.154964
+{txt}_Itreatment_2 {c |}{col 15}{res}{space 2} 1.088029{col 27}{space 2} .0131657{col 38}{space 1}    6.97{col 47}{space 3}0.000{col 55}{space 4} 1.062528{col 68}{space 3} 1.114142
+{txt}_Itreatment_3 {c |}{col 15}{res}{space 2} 1.440646{col 27}{space 2} .0168257{col 38}{space 1}   31.26{col 47}{space 3}0.000{col 55}{space 4} 1.408043{col 68}{space 3} 1.474004
+{txt}_Itreatment_4 {c |}{col 15}{res}{space 2} 1.249742{col 27}{space 2} .0148308{col 38}{space 1}   18.79{col 47}{space 3}0.000{col 55}{space 4}  1.22101{col 68}{space 3} 1.279151
+{txt}{space 8}_cons {c |}{col 15}{res}{space 2} .4217436{col 27}{space 2} .0021113{col 38}{space 1} -172.46{col 47}{space 3}0.000{col 55}{space 4} .4176258{col 68}{space 3} .4259021
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. 
+. gen treat1= _Itreatment_1
+{txt}
+{com}. gen treat2= _Itreatment_2
+{txt}
+{com}. gen treat3= _Itreatment_3
+{txt}
+{com}. gen treat4= _Itreatment_4
+{txt}
+{com}. 
+. gen numvotes= g2000+g2002 +g2004+ p2000+ p2002+ p2004
+{txt}
+{com}. * show that there are six categories of past vote history (because g2004 is always 1)
+. tab numvotes
+
+   {txt}numvotes {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          1 {c |}{res}     21,784        6.33        6.33
+{txt}          2 {c |}{res}     26,060        7.57       13.90
+{txt}          3 {c |}{res}     80,436       23.38       37.28
+{txt}          4 {c |}{res}    136,031       39.53       76.82
+{txt}          5 {c |}{res}     65,852       19.14       95.95
+{txt}          6 {c |}{res}     13,921        4.05      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}    344,084      100.00
+{txt}
+{com}. 
+. * recode hh_size because otherwise the number of observations may differ across the two regressions due to sparse N
+. replace hh_size=6 if hh_size > 6
+{txt}(57 real changes made)
+
+{com}. tab hh_size
+
+  {txt}number of {c |}
+  people in {c |}
+  household {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          1 {c |}{res}     47,834       13.90       13.90
+{txt}          2 {c |}{res}    214,086       62.22       76.12
+{txt}          3 {c |}{res}     57,474       16.70       92.82
+{txt}          4 {c |}{res}     20,916        6.08       98.90
+{txt}          5 {c |}{res}      3,315        0.96       99.87
+{txt}          6 {c |}{res}        459        0.13      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}    344,084      100.00
+{txt}
+{com}. 
+. **** generate the ACTUAL LR test statistic from the full dataset ****
+. 
+. * base model (main effects)
+. logistic voted treat1 treat2 treat3 treat4 numvotes i.hh_size
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}10{txt}){col 67}= {res}  24154.46
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-202541.72{txt}{col 49}Pseudo R2{col 67}= {res}    0.0563
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}       voted{col 14}{c |} Odds Ratio{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}treat1 {c |}{col 14}{res}{space 2} 1.131431{col 26}{space 2} .0140759{col 37}{space 1}    9.93{col 46}{space 3}0.000{col 54}{space 4} 1.104176{col 67}{space 3} 1.159358
+{txt}{space 6}treat2 {c |}{col 14}{res}{space 2} 1.093989{col 26}{space 2} .0136835{col 37}{space 1}    7.18{col 46}{space 3}0.000{col 54}{space 4} 1.067496{col 67}{space 3}  1.12114
+{txt}{space 6}treat3 {c |}{col 14}{res}{space 2} 1.476877{col 26}{space 2} .0178835{col 37}{space 1}   32.20{col 46}{space 3}0.000{col 54}{space 4} 1.442239{col 67}{space 3} 1.512348
+{txt}{space 6}treat4 {c |}{col 14}{res}{space 2} 1.267318{col 26}{space 2} .0155729{col 37}{space 1}   19.28{col 46}{space 3}0.000{col 54}{space 4}  1.23716{col 67}{space 3} 1.298211
+{txt}{space 4}numvotes {c |}{col 14}{res}{space 2} 1.678979{col 26}{space 2} .0062356{col 37}{space 1}  139.52{col 46}{space 3}0.000{col 54}{space 4} 1.666802{col 67}{space 3} 1.691245
+{txt}{space 12} {c |}
+{space 5}hh_size {c |}
+{space 10}2  {c |}{col 14}{res}{space 2} .9818825{col 26}{space 2} .0106805{col 37}{space 1}   -1.68{col 46}{space 3}0.093{col 54}{space 4} .9611707{col 67}{space 3} 1.003041
+{txt}{space 10}3  {c |}{col 14}{res}{space 2} .9420437{col 26}{space 2}  .013145{col 37}{space 1}   -4.28{col 46}{space 3}0.000{col 54}{space 4} .9166292{col 67}{space 3} .9681629
+{txt}{space 10}4  {c |}{col 14}{res}{space 2} 1.014009{col 26}{space 2} .0195232{col 37}{space 1}    0.72{col 46}{space 3}0.470{col 54}{space 4} .9764572{col 67}{space 3} 1.053005
+{txt}{space 10}5  {c |}{col 14}{res}{space 2} .9337388{col 26}{space 2} .0405888{col 37}{space 1}   -1.58{col 46}{space 3}0.115{col 54}{space 4} .8574809{col 67}{space 3} 1.016779
+{txt}{space 10}6  {c |}{col 14}{res}{space 2} 1.552002{col 26}{space 2} .1624988{col 37}{space 1}    4.20{col 46}{space 3}0.000{col 54}{space 4} 1.264064{col 67}{space 3} 1.905528
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0588975{col 26}{space 2}  .001103{col 37}{space 1} -151.22{col 46}{space 3}0.000{col 54}{space 4} .0567749{col 67}{space 3} .0610995
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. global lrchi1 = e(ll)
+{txt}
+{com}. 
+. * alternative model (treatment by numvotes interactions and treatment by hh_size interactions)
+. xi: logistic voted treat1##c.numvotes treat2##c.numvotes treat3##c.numvotes treat4##c.numvotes treat1##i.hh_size treat2##i.hh_size treat3##i.hh_size treat4##i.hh_size
+{txt}note: numvotes omitted because of collinearity
+note: numvotes omitted because of collinearity
+note: numvotes omitted because of collinearity
+{res}
+{txt}Logistic regression{col 49}Number of obs{col 67}= {res}   344,084
+{txt}{col 49}LR chi2({res}34{txt}){col 67}= {res}  24212.77
+{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-202512.56{txt}{col 49}Pseudo R2{col 67}= {res}    0.0564
+
+{txt}{hline 18}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}            voted{col 19}{c |} Odds Ratio{col 31}   Std. Err.{col 43}      z{col 51}   P>|z|{col 59}     [95% Con{col 72}f. Interval]
+{hline 18}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}1.treat1 {c |}{col 19}{res}{space 2} 1.135478{col 31}{space 2} .0686572{col 42}{space 1}    2.10{col 51}{space 3}0.036{col 59}{space 4}  1.00858{col 72}{space 3} 1.278342
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2} 1.687361{col 31}{space 2} .0085614{col 42}{space 1}  103.11{col 51}{space 3}0.000{col 59}{space 4} 1.670664{col 72}{space 3} 1.704225
+{txt}{space 17} {c |}
+treat1#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} 1.014151{col 31}{space 2} .0124695{col 42}{space 1}    1.14{col 51}{space 3}0.253{col 59}{space 4} .9900038{col 72}{space 3} 1.038888
+{txt}{space 17} {c |}
+{space 9}1.treat2 {c |}{col 19}{res}{space 2} 1.210442{col 31}{space 2} .0728809{col 42}{space 1}    3.17{col 51}{space 3}0.002{col 59}{space 4} 1.075705{col 72}{space 3} 1.362056
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat2#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9801452{col 31}{space 2} .0119584{col 42}{space 1}   -1.64{col 51}{space 3}0.100{col 59}{space 4} .9569851{col 72}{space 3} 1.003866
+{txt}{space 17} {c |}
+{space 9}1.treat3 {c |}{col 19}{res}{space 2} 1.598276{col 31}{space 2} .0925191{col 42}{space 1}    8.10{col 51}{space 3}0.000{col 59}{space 4}  1.42685{col 72}{space 3} 1.790297
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat3#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9869326{col 31}{space 2} .0116173{col 42}{space 1}   -1.12{col 51}{space 3}0.264{col 59}{space 4} .9644237{col 72}{space 3} 1.009967
+{txt}{space 17} {c |}
+{space 9}1.treat4 {c |}{col 19}{res}{space 2} 1.511931{col 31}{space 2} .0885662{col 42}{space 1}    7.06{col 51}{space 3}0.000{col 59}{space 4} 1.347938{col 72}{space 3} 1.695875
+{txt}{space 9}numvotes {c |}{col 19}{res}{space 2}        1{col 31}{txt}  (omitted)
+{space 17} {c |}
+treat4#c.numvotes {c |}
+{space 15}1  {c |}{col 19}{res}{space 2} .9761504{col 31}{space 2} .0115855{col 42}{space 1}   -2.03{col 51}{space 3}0.042{col 59}{space 4} .9537053{col 72}{space 3} .9991236
+{txt}{space 17} {c |}
+{space 10}hh_size {c |}
+{space 15}2  {c |}{col 19}{res}{space 2}  1.00053{col 31}{space 2}  .014844{col 42}{space 1}    0.04{col 51}{space 3}0.972{col 59}{space 4} .9718554{col 72}{space 3} 1.030051
+{txt}{space 15}3  {c |}{col 19}{res}{space 2} .9854137{col 31}{space 2} .0186942{col 42}{space 1}   -0.77{col 51}{space 3}0.439{col 59}{space 4} .9494466{col 72}{space 3} 1.022743
+{txt}{space 15}4  {c |}{col 19}{res}{space 2} 1.064013{col 31}{space 2} .0279394{col 42}{space 1}    2.36{col 51}{space 3}0.018{col 59}{space 4} 1.010638{col 72}{space 3} 1.120207
+{txt}{space 15}5  {c |}{col 19}{res}{space 2} .9754859{col 31}{space 2} .0582202{col 42}{space 1}   -0.42{col 51}{space 3}0.678{col 59}{space 4} .8677976{col 72}{space 3} 1.096538
+{txt}{space 15}6  {c |}{col 19}{res}{space 2}  1.70453{col 31}{space 2} .2435003{col 42}{space 1}    3.73{col 51}{space 3}0.000{col 59}{space 4} 1.288269{col 72}{space 3} 2.255293
+{txt}{space 17} {c |}
+{space 3}treat1#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2} .9278668{col 31}{space 2}    .0331{col 42}{space 1}   -2.10{col 51}{space 3}0.036{col 59}{space 4}  .865208{col 72}{space 3} .9950635
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .9304341{col 31}{space 2} .0428307{col 42}{space 1}   -1.57{col 51}{space 3}0.117{col 59}{space 4}  .850163{col 72}{space 3} 1.018284
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .9970601{col 31}{space 2}  .062143{col 42}{space 1}   -0.05{col 51}{space 3}0.962{col 59}{space 4} .8824073{col 72}{space 3}  1.12661
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .9685101{col 31}{space 2} .1460316{col 42}{space 1}   -0.21{col 51}{space 3}0.832{col 59}{space 4} .7207096{col 72}{space 3} 1.301512
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .8963709{col 31}{space 2} .2746912{col 42}{space 1}   -0.36{col 51}{space 3}0.721{col 59}{space 4} .4916303{col 72}{space 3} 1.634319
+{txt}{space 17} {c |}
+{space 3}treat2#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2} 1.003073{col 31}{space 2} .0357334{col 42}{space 1}    0.09{col 51}{space 3}0.931{col 59}{space 4} .9354255{col 72}{space 3} 1.075612
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .9176074{col 31}{space 2} .0419204{col 42}{space 1}   -1.88{col 51}{space 3}0.060{col 59}{space 4} .8390161{col 72}{space 3} 1.003561
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .8670558{col 31}{space 2} .0553346{col 42}{space 1}   -2.24{col 51}{space 3}0.025{col 59}{space 4} .7651107{col 72}{space 3} .9825842
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .6488842{col 31}{space 2} .0975311{col 42}{space 1}   -2.88{col 51}{space 3}0.004{col 59}{space 4} .4833109{col 72}{space 3} .8711798
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} 1.083977{col 31}{space 2} .3747325{col 42}{space 1}    0.23{col 51}{space 3}0.816{col 59}{space 4} .5505017{col 72}{space 3} 2.134429
+{txt}{space 17} {c |}
+{space 3}treat3#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2}  .992444{col 31}{space 2} .0344955{col 42}{space 1}   -0.22{col 51}{space 3}0.827{col 59}{space 4} .9270855{col 72}{space 3}  1.06241
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .8872956{col 31}{space 2} .0397786{col 42}{space 1}   -2.67{col 51}{space 3}0.008{col 59}{space 4}  .812658{col 72}{space 3} .9687882
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2} .8952189{col 31}{space 2} .0546593{col 42}{space 1}   -1.81{col 51}{space 3}0.070{col 59}{space 4} .7942505{col 72}{space 3} 1.009023
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} 1.179139{col 31}{space 2} .1497255{col 42}{space 1}    1.30{col 51}{space 3}0.194{col 59}{space 4} .9193498{col 72}{space 3}  1.51234
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .6177137{col 31}{space 2} .1856889{col 42}{space 1}   -1.60{col 51}{space 3}0.109{col 59}{space 4} .3426971{col 72}{space 3} 1.113433
+{txt}{space 17} {c |}
+{space 3}treat4#hh_size {c |}
+{space 13}1 2  {c |}{col 19}{res}{space 2}  .918181{col 31}{space 2} .0322661{col 42}{space 1}   -2.43{col 51}{space 3}0.015{col 59}{space 4} .8570693{col 72}{space 3} .9836501
+{txt}{space 13}1 3  {c |}{col 19}{res}{space 2} .8920371{col 31}{space 2} .0400526{col 42}{space 1}   -2.54{col 51}{space 3}0.011{col 59}{space 4} .8168905{col 72}{space 3} .9740965
+{txt}{space 13}1 4  {c |}{col 19}{res}{space 2}  .847649{col 31}{space 2} .0530439{col 42}{space 1}   -2.64{col 51}{space 3}0.008{col 59}{space 4} .7498076{col 72}{space 3} .9582575
+{txt}{space 13}1 5  {c |}{col 19}{res}{space 2} .8518758{col 31}{space 2} .1216282{col 42}{space 1}   -1.12{col 51}{space 3}0.262{col 59}{space 4} .6439385{col 72}{space 3} 1.126959
+{txt}{space 13}1 6  {c |}{col 19}{res}{space 2} .9028049{col 31}{space 2} .4625951{col 42}{space 1}   -0.20{col 51}{space 3}0.842{col 59}{space 4} .3307046{col 72}{space 3} 2.464606
+{txt}{space 17} {c |}
+{space 12}_cons {c |}{col 19}{res}{space 2} .0565035{col 31}{space 2} .0014194{col 42}{space 1} -114.39{col 51}{space 3}0.000{col 59}{space 4}  .053789{col 72}{space 3} .0593551
+{txt}{hline 18}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {res:_cons} estimates baseline odds{txt}.{p_end}
+
+{com}. global lrchi2 = e(ll)
+{txt}
+{com}. global true_chi2=2*($lrchi2-$lrchi1)
+{txt}
+{com}. 
+. display 2*($lrchi2-$lrchi1)
+{res}58.307929
+{txt}
+{com}. 
+. **** create null reference distribution of LR test statitics via a loop
+. 
+. gen Z_clust =.
+{txt}(344,084 missing values generated)
+
+{com}. gen junk=. 
+{txt}(344,084 missing values generated)
+
+{com}. gen junk1=.
+{txt}(344,084 missing values generated)
+
+{com}. gen junk2=.
+{txt}(344,084 missing values generated)
+
+{com}. gen junk3=.
+{txt}(344,084 missing values generated)
+
+{com}. gen junk4=.
+{txt}(344,084 missing values generated)
+
+{com}. 
+. cap program drop lr_sim
+{txt}
+{com}. program define lr_sim, rclass
+{txt}  1{com}.         cluster_ra Z_clust, cluster_var(hh_id) m_each(100000 20000 20000 20000 20002) replace
+{txt}  2{com}.         replace junk = Z_clust
+{txt}  3{com}.         qui xi: logistic voted i.junk
+{txt}  4{com}.         replace junk1= _Ijunk_2
+{txt}  5{com}.         replace junk2= _Ijunk_3
+{txt}  6{com}.         replace junk3= _Ijunk_4
+{txt}  7{com}.         replace junk4= _Ijunk_5
+{txt}  8{com}.         qui logistic voted treat1 treat2 treat3 treat4 numvotes i.hh_size junk1 junk2 junk3 junk4
+{txt}  9{com}.         local lr1 = e(ll)       
+{txt} 10{com}.         qui xi: logistic voted treat1 treat2 treat3 treat4 junk1##c.numvotes junk2##c.numvotes junk3##c.numvotes        junk4##c.numvotes junk1##i.hh_size junk2##i.hh_size junk3##i.hh_size junk4##i.hh_size 
+{txt} 11{com}.         local lr2 = e(ll)
+{txt} 12{com}.         return scalar chi2=2*(`lr2'-`lr1')      
+{txt} 13{com}. end
+{txt}
+{com}. 
+. * Simulate the null reference distribution with an arbitrary degree of precision depending on "reps"
+. preserve
+{txt}
+{com}. simulate chi2=r(chi2), reps(1000) seed(123) saving(ri_lr.dta, replace): lr_sim
+{p2colset 7 17 21 2}{...}
+
+{txt}{p2col :command:}lr_sim{p_end}
+{p2colset 10 17 21 2}{...}
+{p2col :chi2:}{res:r(chi2)}{p_end}
+(note: file ri_lr.dta not found)
+
+Simulations ({res}1000{txt})
+{hline 4}{c +}{hline 3} 1 {hline 3}{c +}{hline 3} 2 {hline 3}{c +}{hline 3} 3 {hline 3}{c +}{hline 3} 4 {hline 3}{c +}{hline 3} 5 
+..................................................    50
+..................................................   100
+..................................................   150
+..................................................   200
+..................................................   250
+..................................................   300
+..................................................   350
+..................................................   400
+..................................................   450
+..................................................   500
+..................................................   550
+..................................................   600
+..................................................   650
+..................................................   700
+..................................................   750
+..................................................   800
+..................................................   850
+..................................................   900
+..................................................   950
+..................................................  1000
+
+{com}. restore
+{txt}
+{com}. 
+. **** Load null distribution, Calculate p-value and graph the test statistic in relation to the null distribution
+. use "ri_lr.dta",clear
+{txt}(simulate: lr_sim)
+
+{com}. 
+. qui count if chi2 >= $true_chi2
+{txt}
+{com}. disp "p-value: " r(N)/_N
+{res}p-value: .149
+{txt}
+{com}. 
+. /*
+> * display the p-value graphically
+> graph twoway (histogram chi2,frequency bin(20)) ///
+> (scatteri 0 $true_chi2 80 $true_chi2, c(l) lc(red) lw(thick) lp(dash) m(i)), ///
+> legend(off) ///
+> title("Distribution under the null") ///
+> xtitle("")
+> */
+. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}/Users/dongreen/Dropbox/Social Pressure pubs/ETOV 2006/Output from LR test for GGL2008 for ISPS data archive.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}27 Apr 2020, 06:11:30
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

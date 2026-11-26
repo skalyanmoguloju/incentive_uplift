@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "files": {
+    "training_table": "training_table.parquet",
+    "features": "X.parquet"
+  },
+  "row_count": 44367,
+  "row_id_column": "row_id",
+  "row_key_columns": [
+    "person",
+    "decision_time"
+  ],
+  "feature_columns": [
+    "age",
+    "income",
+    "decision_time",
+    "prior_purchase_count",
+    "prior_total_spend",
+    "has_prior_purchase",
+    "days_since_last_purchase",
+    "prior_unmatched_purchase_count",
+    "prior_unmatched_spend",
+    "prior_offers_received",
+    "prior_offers_completed",
+    "membership_join_day",
+    "age_missing",
+    "income_missing",
+    "decision_time_missing",
+    "prior_purchase_count_missing",
+    "prior_total_spend_missing",
+    "has_prior_purchase_missing",
+    "days_since_last_purchase_missing",
+    "prior_unmatched_purchase_count_missing",
+    "prior_unmatched_spend_missing",
+    "prior_offers_received_missing",
+    "prior_offers_completed_missing",
+    "membership_join_day_missing",
+    "gender_F",
+    "gender_M",
+    "gender_O",
+    "gender_Unknown"
+  ],
+  "feature_dtypes": {
+    "age": "float64",
+    "income": "float64",
+    "decision_time": "float64",
+    "prior_purchase_count": "float64",
+    "prior_total_spend": "float64",
+    "has_prior_purchase": "float64",
+    "days_since_last_purchase": "float64",
+    "prior_unmatched_purchase_count": "float64",
+    "prior_unmatched_spend": "float64",
+    "prior_offers_received": "float64",
+    "prior_offers_completed": "float64",
+    "membership_join_day": "float64",
+    "age_missing": "int64",
+    "income_missing": "int64",
+    "decision_time_missing": "int64",
+    "prior_purchase_count_missing": "int64",
+    "prior_total_spend_missing": "int64",
+    "has_prior_purchase_missing": "int64",
+    "days_since_last_purchase_missing": "int64",
+    "prior_unmatched_purchase_count_missing": "int64",
+    "prior_unmatched_spend_missing": "int64",
+    "prior_offers_received_missing": "int64",
+    "prior_offers_completed_missing": "int64",
+    "membership_join_day_missing": "int64",
+    "gender_F": "int64",
+    "gender_M": "int64",
+    "gender_O": "int64",
+    "gender_Unknown": "int64"
+  },
+  "treatment_column": "treatment",
+  "treatment_arms": {
+    "0": "no_offer",
+    "1": "bogo",
+    "2": "discount",
+    "3": "informational"
+  },
+  "outcome_columns": {
+    "purchase": "purchased",
+    "spend": "spend"
+  },
+  "split_column": "split",
+  "split_counts": {
+    "train": 39362,
+    "validation": 3019,
+    "test": 1986
+  },
+  "split_decision_hours": {
+    "train": [
+      0,
+      168,
+      336,
+      408
+    ],
+    "validation": [
+      504
+    ],
+    "test": [
+      576
+    ]
+  },
+  "followup_hours": 72,
+  "observation_end_hour": 714.0,
+  "study_start_date": null,
+  "membership_feature": "membership_join_day",
+  "preparation": {
+    "history_window": "All events strictly before decision_time.",
+    "outcome_window": "[decision_time, decision_time + followup_hours).",
+    "transaction_matching": "One-to-one completion/transaction pairing by customer, time, appearance order.",
+    "exclusions": "Prior active offer, multiple new offers, unknown arm, later receipt, incomplete follow-up.",
+    "cohort": "All profile customers assumed eligible at each decision wave.",
+    "split_policy": "Earlier waves train; penultimate wave validation; last wave test. Customers may recur.",
+    "numeric_missing": "Fixed -1 sentinel plus a missingness indicator.",
+    "gender_encoding": "One-hot F, M, O, Unknown; absent or unrecognized values become Unknown.",
+    "demographics": "Cleaned profiles; age/income already imputed upstream.",
+    "causal_limit": "Prepared inputs do not establish random treatment assignment or causal validity."
+  },
+  "sources": {
+    "transactions_and_completions": "data\\processed\\transcript_cleaned.jsonl",
+    "demographics": "data\\processed\\profile_cleaned.jsonl",
+    "exposure_receipts": "data\\processed\\transcript_cleaned.jsonl",
+    "exposure_catalog": "data\\processed\\portfolio_cleaned.jsonl"
+  }
+}
